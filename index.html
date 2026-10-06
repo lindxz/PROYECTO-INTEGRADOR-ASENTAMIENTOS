@@ -1,0 +1,4671 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Sistema de Catálogos</title>
+
+
+    <style>
+
+        /* =====================================================
+           CONFIGURACIÓN GENERAL
+        ===================================================== */
+
+        * {
+            box-sizing: border-box;
+        }
+
+
+        body {
+
+            margin: 0;
+
+            font-family: Arial, Helvetica, sans-serif;
+
+            background-color: #0c0c4b
+;
+
+        }
+
+
+        /* =====================================================
+           VENTANAS
+        ===================================================== */
+
+        .ventana {
+
+            width: 950px;
+
+            min-height: 550px;
+
+            margin: 40px auto;
+
+            background-color: #fefeff
+;
+
+            border-radius: 8px;
+
+            box-shadow:
+                0 4px 15px rgba(0,0,0,0.25);
+
+            overflow: hidden;
+
+        }
+
+
+        .titulo-ventana {
+
+            padding: 12px 20px;
+
+            font-size: 18px;
+
+            font-weight: bold;
+
+        }
+
+
+        /* =====================================================
+           MENU SUPERIOR
+        ===================================================== */
+
+        .menu {
+
+            display: flex;
+
+            flex-wrap: wrap;
+
+            gap: 7px;
+
+            padding: 10px;
+
+            background-color: #a4a4c5
+;
+
+        }
+
+
+        .menu button {
+
+            border: none;
+
+            background-color: #ceced6
+;
+
+            color: #222;
+
+            border-radius: 20px;
+
+            padding: 9px 14px;
+
+            cursor: pointer;
+
+            font-size: 11px;
+
+        }
+
+
+        .menu button:hover {
+
+            background-color: #888;
+
+            color: white;
+
+        }
+
+
+        /* =====================================================
+           CONTENIDO
+        ===================================================== */
+
+        .contenido {
+
+            padding: 25px;
+
+        }
+
+
+        /* =====================================================
+           FORMULARIOS
+        ===================================================== */
+
+        .formulario {
+
+            display: flex;
+
+            flex-wrap: wrap;
+
+            gap: 15px;
+
+            align-items: end;
+
+            margin-bottom: 20px;
+
+        }
+
+
+        .campo {
+
+            display: flex;
+
+            flex-direction: column;
+
+        }
+
+
+        .campo label {
+
+            font-size: 13px;
+
+            font-weight: bold;
+
+            margin-bottom: 6px;
+
+        }
+
+
+        .campo input,
+        .campo select {
+
+            width: 175px;
+
+            height: 38px;
+
+            padding: 8px;
+
+            border: 1px solid #888;
+
+            border-radius: 4px;
+
+            background-color: white;
+
+            font-size: 14px;
+
+        }
+
+
+        .campo-grande input {
+
+            width: 230px;
+
+        }
+
+
+        /* =====================================================
+           BUSCADOR
+        ===================================================== */
+
+        .busqueda {
+
+            display: flex;
+
+            align-items: end;
+
+            gap: 10px;
+
+            margin-bottom: 20px;
+
+        }
+
+
+        .busqueda .campo input {
+
+            width: 300px;
+
+        }
+
+
+        .boton-buscar {
+
+            height: 38px;
+
+        }
+
+
+        /* =====================================================
+           TABLAS
+        ===================================================== */
+
+        .tabla-contenedor {
+
+            width: 100%;
+
+            height: 285px;
+
+            overflow: auto;
+
+            background-color: white;
+
+            border: 2px solid #888;
+
+        }
+
+
+        table {
+
+            width: 100%;
+
+            border-collapse: collapse;
+
+            min-width: 650px;
+
+        }
+
+
+        th {
+
+            background-color: #888;
+
+            color: white;
+
+            padding: 11px;
+
+            border: 1px solid #777;
+
+            position: sticky;
+
+            top: 0;
+
+            z-index: 1;
+
+        }
+
+
+        td {
+
+            padding: 10px;
+
+            text-align: center;
+
+            border: 1px solid #ccc;
+
+        }
+
+
+        tbody tr {
+
+            cursor: pointer;
+
+        }
+
+
+        tbody tr:hover {
+
+            background-color: #eeeeee;
+
+        }
+
+
+        tbody tr.seleccionado {
+
+            background-color: #c5d9f1;
+
+        }
+
+
+        /* =====================================================
+           BOTONES
+        ===================================================== */
+
+        .botones {
+
+            display: flex;
+
+            gap: 12px;
+
+            margin-top: 20px;
+
+        }
+
+
+        .boton {
+
+            border: none;
+
+            background-color: #888;
+
+            color: white;
+
+            padding: 10px 18px;
+
+            border-radius: 20px;
+
+            cursor: pointer;
+
+            font-size: 13px;
+
+        }
+
+
+        .boton:hover {
+
+            background-color: #666;
+
+        }
+
+
+        .boton-salir {
+
+            margin-left: auto;
+
+        }
+
+
+        /* =====================================================
+   BIENVENIDA
+===================================================== */
+
+.bienvenida {
+
+    width: 650px;
+
+    margin: 150px auto;
+
+    padding: 50px;
+
+    background-color: #d3d3d3;
+
+    border-radius: 8px;
+
+    box-shadow:
+        0 4px 15px rgba(0,0,0,0.25);
+
+    text-align: center;
+
+}
+
+.bienvenida h1 {
+
+    margin-bottom: 20px;
+
+    color: #191970;
+
+}
+
+.bienvenida p {
+
+    font-size: 16px;
+
+    margin-bottom: 30px;
+
+}
+
+.bienvenida .boton {
+
+    background-color: #191970;
+
+    padding: 12px 30px;
+
+    font-size: 14px;
+
+}
+
+.bienvenida .boton:hover {
+
+    background-color: #0c0c4b;
+
+}
+
+        
+        /* =====================================================
+           LOGIN
+        ===================================================== */
+
+        .login {
+
+            width: 450px;
+
+            margin: 100px auto;
+
+            padding: 35px;
+
+            background-color: #d3d3d3;
+
+            border-radius: 8px;
+
+            box-shadow:
+                0 4px 15px rgba(0,0,0,0.25);
+
+        }
+
+
+        .login h1 {
+
+            text-align: center;
+
+            margin-bottom: 30px;
+
+        }
+
+
+        .login .campo {
+
+            margin-bottom: 20px;
+
+        }
+
+
+        .login .campo input {
+
+            width: 100%;
+
+        }
+
+
+        .centrar {
+
+            text-align: center;
+
+            margin-top: 25px;
+
+        }
+
+
+        /* =====================================================
+           MODAL
+        ===================================================== */
+
+        .modal {
+
+            display: none;
+
+            position: fixed;
+
+            inset: 0;
+
+            background-color:
+                rgba(0,0,0,0.45);
+
+            justify-content: center;
+
+            align-items: center;
+
+            z-index: 1000;
+
+        }
+
+
+        .modal-contenido {
+
+            width: 420px;
+
+            background-color: #d3d3d3;
+
+            padding: 25px;
+
+            border-radius: 8px;
+
+            box-shadow:
+                0 5px 20px rgba(0,0,0,0.4);
+
+            text-align: center;
+
+        }
+
+
+        .modal-contenido h2 {
+
+            margin-top: 0;
+
+        }
+
+
+        .modal-mensaje {
+
+            background-color: white;
+
+            border: 2px solid #333;
+
+            padding: 22px;
+
+            margin: 20px 0;
+
+        }
+
+
+        /* =====================================================
+           OCULTO
+        ===================================================== */
+
+        .oculto {
+
+            display: none !important;
+
+        }
+
+
+        /* =====================================================
+           MENSAJE VACIO
+        ===================================================== */
+
+        .sin-resultados {
+
+            text-align: center;
+
+            color: #777;
+
+            padding: 25px;
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+<!-- =========================================================
+     VENTANA DE BIENVENIDA
+========================================================= -->
+
+<div id="bienvenida" class="bienvenida">
+
+    <h1>
+        BIENVENIDO
+    </h1>
+
+    <p>
+        Sistema de Catálogos
+    </p>
+
+    <p>
+        Presiona el botón para ingresar al sistema.
+    </p>
+
+    <button
+        class="boton"
+        onclick="irAlLogin()"
+    >
+        INGRESAR
+    </button>
+
+</div>
+
+
+    
+
+
+<!-- =========================================================
+     LOGIN
+========================================================= -->
+
+<div id="login" class="login">
+
+    <h1>LOGIN</h1>
+
+
+    <div class="campo">
+
+        <label>
+            USUARIO
+        </label>
+
+        <input
+            type="text"
+            id="usuario"
+            placeholder="Ingrese usuario"
+        >
+
+    </div>
+
+
+    <div class="campo">
+
+        <label>
+            CONTRASEÑA
+        </label>
+
+        <input
+            type="password"
+            id="contrasena"
+            placeholder="Ingrese contraseña"
+        >
+
+    </div>
+
+
+    <div class="centrar">
+
+        <button
+            class="boton"
+            onclick="iniciarSesion()"
+        >
+
+            INGRESAR
+
+        </button>
+
+    </div>
+
+</div>
+
+
+
+<!-- =========================================================
+     MENU PRINCIPAL
+========================================================= -->
+
+<div id="principal"
+     class="ventana oculto">
+
+    <div class="titulo-ventana">
+        Principal
+    </div>
+
+
+    <div class="menu">
+
+        <button onclick="abrirEstado()">
+            ESTADO
+        </button>
+
+        <button onclick="abrirMunicipio()">
+            MUNICIPIO
+        </button>
+
+        <button onclick="abrirCiudad()">
+            CIUDAD
+        </button>
+
+        <button onclick="abrirTipoAsentamiento()">
+            TIPO ASENTAMIENTO
+        </button>
+
+        <button onclick="abrirAsentamiento()">
+            ASENTAMIENTO
+        </button>
+
+        <button onclick="abrirZona()">
+            ZONA
+        </button>
+
+        <button onclick="abrirCodigoPostal()">
+            CP
+        </button>
+
+    </div>
+
+
+    <div class="contenido">
+
+        <h2>
+            Menú principal
+        </h2>
+
+        <p>
+            Selecciona una opción del menú.
+        </p>
+
+
+        <div class="botones">
+
+            <button
+                class="boton boton-salir"
+                onclick="cerrarSesion()"
+            >
+                SALIR
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<!-- =========================================================
+     ESTADO
+========================================================= -->
+
+<div id="ventanaEstado"
+     class="ventana oculto">
+
+
+    <div class="titulo-ventana">
+        VENTANA ESTADO
+    </div>
+
+
+    <!-- MENU -->
+
+    <div class="menu">
+
+        <button onclick="abrirEstado()">
+            ESTADO
+        </button>
+
+        <button onclick="abrirMunicipio()">
+            MUNICIPIO
+        </button>
+
+        <button onclick="abrirCiudad()">
+            CIUDAD
+        </button>
+
+        <button onclick="abrirTipoAsentamiento()">
+            TIPO ASENTAMIENTO
+        </button>
+
+        <button onclick="abrirAsentamiento()">
+            ASENTAMIENTO
+        </button>
+
+        <button onclick="abrirZona()">
+            ZONA
+        </button>
+
+        <button onclick="abrirCodigoPostal()">
+            CP
+        </button>
+
+    </div>
+
+
+    <div class="contenido">
+
+
+        <div class="formulario">
+
+
+            <div class="campo">
+
+                <label>
+                    ID
+                </label>
+
+                <input
+                    type="number"
+                    id="estadoId"
+                >
+
+            </div>
+
+
+            <div class="campo campo-grande">
+
+                <label>
+                    NOMBRE
+                </label>
+
+                <input
+                    type="text"
+                    id="estadoNombre"
+                >
+
+            </div>
+
+        </div>
+
+
+        <div class="tabla-contenedor">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>ID</th>
+
+                        <th>NOMBRE</th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody id="tablaEstados">
+                </tbody>
+
+            </table>
+
+        </div>
+
+
+        <div class="botones">
+
+            <button
+                class="boton"
+                onclick="agregarEstado()"
+            >
+                AGREGAR
+            </button>
+
+
+            <button
+                class="boton"
+                onclick="actualizarEstado()"
+            >
+                ACTUALIZAR
+            </button>
+
+
+            <button
+                class="boton"
+                onclick="eliminarEstado()"
+            >
+                ELIMINAR
+            </button>
+
+
+            <button
+                class="boton boton-salir"
+                onclick="volverPrincipal()"
+            >
+                SALIR
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<!-- =========================================================
+     MUNICIPIO
+========================================================= -->
+
+<div id="ventanaMunicipio"
+     class="ventana oculto">
+
+
+    <div class="titulo-ventana">
+        VENTANA MUNICIPIO
+    </div>
+
+
+    <div class="menu">
+
+        <button onclick="abrirEstado()">ESTADO</button>
+
+        <button onclick="abrirMunicipio()">MUNICIPIO</button>
+
+        <button onclick="abrirCiudad()">CIUDAD</button>
+
+        <button onclick="abrirTipoAsentamiento()">
+            TIPO ASENTAMIENTO
+        </button>
+
+        <button onclick="abrirAsentamiento()">
+            ASENTAMIENTO
+        </button>
+
+        <button onclick="abrirZona()">ZONA</button>
+
+        <button onclick="abrirCodigoPostal()">CP</button>
+
+    </div>
+
+
+    <div class="contenido">
+
+
+        <div class="formulario">
+
+
+            <div class="campo">
+
+                <label>
+                    ID MUNICIPIO
+                </label>
+
+                <input
+                    type="number"
+                    id="municipioId"
+                >
+
+            </div>
+
+
+            <div class="campo">
+
+                <label>
+                    ESTADO
+                </label>
+
+                <select id="municipioEstado">
+                </select>
+
+            </div>
+
+
+            <div class="campo campo-grande">
+
+                <label>
+                    NOMBRE
+                </label>
+
+                <input
+                    type="text"
+                    id="municipioNombre"
+                >
+
+            </div>
+
+        </div>
+
+
+        <div class="tabla-contenedor">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>ID MUNICIPIO</th>
+
+                        <th>ESTADO</th>
+
+                        <th>NOMBRE</th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody id="tablaMunicipios">
+                </tbody>
+
+            </table>
+
+        </div>
+
+
+        <div class="botones">
+
+            <button
+                class="boton"
+                onclick="agregarMunicipio()"
+            >
+                AGREGAR
+            </button>
+
+
+            <button
+                class="boton"
+                onclick="actualizarMunicipio()"
+            >
+                ACTUALIZAR
+            </button>
+
+
+            <button
+                class="boton"
+                onclick="eliminarMunicipio()"
+            >
+                ELIMINAR
+            </button>
+
+
+            <button
+                class="boton boton-salir"
+                onclick="volverPrincipal()"
+            >
+                SALIR
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<!-- =========================================================
+     CIUDAD
+========================================================= -->
+
+<div id="ventanaCiudad"
+     class="ventana oculto">
+
+
+    <div class="titulo-ventana">
+        VENTANA CIUDAD
+    </div>
+
+
+    <div class="menu">
+
+        <button onclick="abrirEstado()">ESTADO</button>
+
+        <button onclick="abrirMunicipio()">MUNICIPIO</button>
+
+        <button onclick="abrirCiudad()">CIUDAD</button>
+
+        <button onclick="abrirTipoAsentamiento()">
+            TIPO ASENTAMIENTO
+        </button>
+
+        <button onclick="abrirAsentamiento()">
+            ASENTAMIENTO
+        </button>
+
+        <button onclick="abrirZona()">ZONA</button>
+
+        <button onclick="abrirCodigoPostal()">CP</button>
+
+    </div>
+
+
+    <div class="contenido">
+
+
+        <div class="formulario">
+
+
+            <div class="campo">
+
+                <label>
+                    ID
+                </label>
+
+                <input
+                    type="number"
+                    id="ciudadId"
+                >
+
+            </div>
+
+
+            <div class="campo">
+
+                <label>
+                    CIUDAD
+                </label>
+
+                <input
+                    type="text"
+                    id="ciudadCiudad"
+                >
+
+            </div>
+
+
+            <div class="campo">
+
+                <label>
+                    ESTADO
+                </label>
+
+                <select
+                    id="ciudadEstado"
+                    onchange="cargarMunicipiosCiudad()"
+                >
+                </select>
+
+            </div>
+
+
+            <div class="campo">
+
+                <label>
+                    MUNICIPIO
+                </label>
+
+                <select id="ciudadMunicipio">
+                </select>
+
+            </div>
+
+
+            <div class="campo">
+
+                <label>
+                    NOMBRE
+                </label>
+
+                <input
+                    type="text"
+                    id="ciudadNombre"
+                >
+
+            </div>
+
+        </div>
+
+
+        <div class="tabla-contenedor">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>ID</th>
+
+                        <th>CIUDAD</th>
+
+                        <th>ESTADO</th>
+
+                        <th>MUNICIPIO</th>
+
+                        <th>NOMBRE</th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody id="tablaCiudades">
+                </tbody>
+
+            </table>
+
+        </div>
+
+
+        <div class="botones">
+
+            <button
+                class="boton"
+                onclick="agregarCiudad()"
+            >
+                AGREGAR
+            </button>
+
+
+            <button
+                class="boton"
+                onclick="actualizarCiudad()"
+            >
+                ACTUALIZAR
+            </button>
+
+
+            <button
+                class="boton"
+                onclick="eliminarCiudad()"
+            >
+                ELIMINAR
+            </button>
+
+
+            <button
+                class="boton boton-salir"
+                onclick="volverPrincipal()"
+            >
+                SALIR
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<!-- =========================================================
+     TIPO ASENTAMIENTO
+========================================================= -->
+
+<div id="ventanaTipoAsentamiento"
+     class="ventana oculto">
+
+
+    <div class="titulo-ventana">
+        VENTANA TIPO ASENTAMIENTO
+    </div>
+
+
+    <div class="menu">
+
+        <button onclick="abrirEstado()">ESTADO</button>
+
+        <button onclick="abrirMunicipio()">MUNICIPIO</button>
+
+        <button onclick="abrirCiudad()">CIUDAD</button>
+
+        <button onclick="abrirTipoAsentamiento()">
+            TIPO ASENTAMIENTO
+        </button>
+
+        <button onclick="abrirAsentamiento()">
+            ASENTAMIENTO
+        </button>
+
+        <button onclick="abrirZona()">ZONA</button>
+
+        <button onclick="abrirCodigoPostal()">CP</button>
+
+    </div>
+
+
+    <div class="contenido">
+
+
+        <div class="formulario">
+
+
+            <div class="campo">
+
+                <label>
+                    ID
+                </label>
+
+                <input
+                    type="number"
+                    id="tipoAsentamientoId"
+                >
+
+            </div>
+
+
+            <div class="campo campo-grande">
+
+                <label>
+                    NOMBRE
+                </label>
+
+                <input
+                    type="text"
+                    id="tipoAsentamientoNombre"
+                >
+
+            </div>
+
+        </div>
+
+
+        <div class="tabla-contenedor">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>ID</th>
+
+                        <th>NOMBRE</th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody id="tablaTiposAsentamiento">
+                </tbody>
+
+            </table>
+
+        </div>
+
+
+        <div class="botones">
+
+            <button
+                class="boton"
+                onclick="agregarTipoAsentamiento()"
+            >
+                AGREGAR
+            </button>
+
+
+            <button
+                class="boton"
+                onclick="actualizarTipoAsentamiento()"
+            >
+                ACTUALIZAR
+            </button>
+
+
+            <button
+                class="boton"
+                onclick="eliminarTipoAsentamiento()"
+            >
+                ELIMINAR
+            </button>
+
+
+            <button
+                class="boton boton-salir"
+                onclick="volverPrincipal()"
+            >
+                SALIR
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<!-- =========================================================
+     ASENTAMIENTO
+========================================================= -->
+
+<div id="ventanaAsentamiento"
+     class="ventana oculto">
+
+
+    <div class="titulo-ventana">
+        VENTANA ASENTAMIENTO
+    </div>
+
+
+    <div class="menu">
+
+        <button onclick="abrirEstado()">ESTADO</button>
+
+        <button onclick="abrirMunicipio()">MUNICIPIO</button>
+
+        <button onclick="abrirCiudad()">CIUDAD</button>
+
+        <button onclick="abrirTipoAsentamiento()">
+            TIPO ASENTAMIENTO
+        </button>
+
+        <button onclick="abrirAsentamiento()">
+            ASENTAMIENTO
+        </button>
+
+        <button onclick="abrirZona()">ZONA</button>
+
+        <button onclick="abrirCodigoPostal()">CP</button>
+
+    </div>
+
+
+    <div class="contenido">
+
+
+        <!-- =================================================
+             BUSCADOR
+        ================================================== -->
+
+        <div class="busqueda">
+
+            <div class="campo">
+
+                <label>
+                    BUSCAR ASENTAMIENTO
+                </label>
+
+                <input
+                    type="text"
+                    id="buscarAsentamiento"
+                    placeholder="Escriba para buscar..."
+                    oninput="buscarAsentamiento()"
+                >
+
+            </div>
+
+
+            <button
+                class="boton boton-buscar"
+                onclick="buscarAsentamiento()"
+            >
+                BUSCAR
+            </button>
+
+        </div>
+
+
+
+        <!-- =================================================
+             FORMULARIO
+        ================================================== -->
+
+        <div class="formulario">
+
+
+            <div class="campo">
+
+                <label>
+                    ID
+                </label>
+
+                <input
+                    type="number"
+                    id="asentamientoId"
+                >
+
+            </div>
+
+
+            <div class="campo">
+
+                <label>
+                    MUNICIPIO
+                </label>
+
+                <select
+                    id="asentamientoMunicipio"
+                >
+                </select>
+
+            </div>
+
+
+            <div class="campo">
+
+                <label>
+                    CÓDIGO POSTAL
+                </label>
+
+                <input
+                    type="text"
+                    id="asentamientoCodigoPostal"
+                >
+
+            </div>
+
+
+            <div class="campo">
+
+                <label>
+                    NOMBRE
+                </label>
+
+                <input
+                    type="text"
+                    id="asentamientoNombre"
+                >
+
+            </div>
+
+
+            <div class="campo">
+
+                <label>
+                    ESTADO DEL ASENTAMIENTO
+                </label>
+
+                <select
+                    id="asentamientoEstado"
+                >
+                </select>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- =================================================
+             TABLA
+        ================================================== -->
+
+        <div class="tabla-contenedor">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>ID</th>
+
+                        <th>MUNICIPIO</th>
+
+                        <th>CÓDIGO POSTAL</th>
+
+                        <th>NOMBRE</th>
+
+                        <th>ESTADO</th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody id="tablaAsentamientos">
+                </tbody>
+
+            </table>
+
+        </div>
+
+
+
+        <!-- =================================================
+             BOTONES
+        ================================================== -->
+
+        <div class="botones">
+
+            <button
+                class="boton"
+                onclick="agregarAsentamiento()"
+            >
+                AGREGAR
+            </button>
+
+
+            <button
+                class="boton"
+                onclick="actualizarAsentamiento()"
+            >
+                ACTUALIZAR
+            </button>
+
+
+            <button
+                class="boton"
+                onclick="eliminarAsentamiento()"
+            >
+                ELIMINAR
+            </button>
+
+
+            <button
+                class="boton boton-salir"
+                onclick="volverPrincipal()"
+            >
+                SALIR
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<!-- =========================================================
+     ZONA
+========================================================= -->
+
+<div id="ventanaZona"
+     class="ventana oculto">
+
+
+    <div class="titulo-ventana">
+        VENTANA ZONA
+    </div>
+
+
+    <div class="menu">
+
+        <button onclick="abrirEstado()">ESTADO</button>
+
+        <button onclick="abrirMunicipio()">MUNICIPIO</button>
+
+        <button onclick="abrirCiudad()">CIUDAD</button>
+
+        <button onclick="abrirTipoAsentamiento()">
+            TIPO ASENTAMIENTO
+        </button>
+
+        <button onclick="abrirAsentamiento()">
+            ASENTAMIENTO
+        </button>
+
+        <button onclick="abrirZona()">
+            ZONA
+        </button>
+
+        <button onclick="abrirCodigoPostal()">
+            CP
+        </button>
+
+    </div>
+
+
+    <div class="contenido">
+
+
+        <div class="formulario">
+
+
+            <div class="campo">
+
+                <label>
+                    ID
+                </label>
+
+                <input
+                    type="number"
+                    id="zonaId"
+                >
+
+            </div>
+
+
+            <div class="campo campo-grande">
+
+                <label>
+                    NOMBRE
+                </label>
+
+                <input
+                    type="text"
+                    id="zonaNombre"
+                >
+
+            </div>
+
+        </div>
+
+
+        <div class="tabla-contenedor">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>ID</th>
+
+                        <th>NOMBRE</th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody id="tablaZonas">
+                </tbody>
+
+            </table>
+
+        </div>
+
+
+        <div class="botones">
+
+            <button
+                class="boton"
+                onclick="agregarZona()"
+            >
+                AGREGAR
+            </button>
+
+
+            <button
+                class="boton"
+                onclick="actualizarZona()"
+            >
+                ACTUALIZAR
+            </button>
+
+
+            <button
+                class="boton"
+                onclick="eliminarZona()"
+            >
+                ELIMINAR
+            </button>
+
+
+            <button
+                class="boton boton-salir"
+                onclick="volverPrincipal()"
+            >
+                SALIR
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<!-- =========================================================
+     CÓDIGO POSTAL
+========================================================= -->
+
+<div id="ventanaCodigoPostal"
+     class="ventana oculto">
+
+
+    <div class="titulo-ventana">
+        VENTANA CÓDIGO POSTAL
+    </div>
+
+
+    <div class="menu">
+
+        <button onclick="abrirEstado()">ESTADO</button>
+
+        <button onclick="abrirMunicipio()">MUNICIPIO</button>
+
+        <button onclick="abrirCiudad()">CIUDAD</button>
+
+        <button onclick="abrirTipoAsentamiento()">
+            TIPO ASENTAMIENTO
+        </button>
+
+        <button onclick="abrirAsentamiento()">
+            ASENTAMIENTO
+        </button>
+
+        <button onclick="abrirZona()">ZONA</button>
+
+        <button onclick="abrirCodigoPostal()">
+            CP
+        </button>
+
+    </div>
+
+
+    <div class="contenido">
+
+
+        <div class="formulario">
+
+
+            <div class="campo">
+
+                <label>
+                    ID
+                </label>
+
+                <input
+                    type="number"
+                    id="codigoPostalId"
+                >
+
+            </div>
+
+
+            <div class="campo campo-grande">
+
+                <label>
+                    NOMBRE
+                </label>
+
+                <input
+                    type="text"
+                    id="codigoPostalNombre"
+                >
+
+            </div>
+
+        </div>
+
+
+        <div class="tabla-contenedor">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>ID</th>
+
+                        <th>NOMBRE</th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody id="tablaCodigosPostales">
+                </tbody>
+
+            </table>
+
+        </div>
+
+
+        <div class="botones">
+
+            <button
+                class="boton"
+                onclick="agregarCodigoPostal()"
+            >
+                AGREGAR
+            </button>
+
+
+            <button
+                class="boton"
+                onclick="actualizarCodigoPostal()"
+            >
+                ACTUALIZAR
+            </button>
+
+
+            <button
+                class="boton"
+                onclick="eliminarCodigoPostal()"
+            >
+                ELIMINAR
+            </button>
+
+
+            <button
+                class="boton boton-salir"
+                onclick="volverPrincipal()"
+            >
+                SALIR
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<!-- =========================================================
+     MODAL
+========================================================= -->
+
+<div id="modal"
+     class="modal">
+
+    <div class="modal-contenido">
+
+        <h2 id="modalTitulo">
+            MENSAJE
+        </h2>
+
+
+        <div id="modalMensaje"
+             class="modal-mensaje">
+        </div>
+
+
+        <button
+            class="boton"
+            onclick="cerrarModal()"
+        >
+            ACEPTAR
+        </button>
+
+    </div>
+
+</div>
+
+
+
+<script>
+
+/* ============================================================
+   DATOS
+============================================================ */
+
+
+/* ================= ESTADOS ================= */
+
+let estados = [
+
+    {
+        id: 1,
+        nombre: "Estado de México"
+    },
+
+    {
+        id: 2,
+        nombre: "Ciudad de México"
+    },
+
+    {
+        id: 3,
+        nombre: "Puebla"
+    }
+
+];
+
+
+
+/* ================= MUNICIPIOS ================= */
+
+let municipios = [
+
+    {
+        id: 1,
+        estadoId: 1,
+        nombre: "Los Reyes"
+    },
+
+    {
+        id: 2,
+        estadoId: 1,
+        nombre: "Chimalhuacán"
+    },
+
+    {
+        id: 3,
+        estadoId: 1,
+        nombre: "Nezahualcóyotl"
+    },
+
+    {
+        id: 4,
+        estadoId: 2,
+        nombre: "Iztapalapa"
+    },
+
+    {
+        id: 5,
+        estadoId: 2,
+        nombre: "Coyoacán"
+    },
+
+    {
+        id: 6,
+        estadoId: 3,
+        nombre: "Puebla"
+    }
+
+];
+
+
+
+/* ================= CIUDADES ================= */
+
+let ciudades = [
+
+    {
+        id: 1,
+        ciudad: "Los Reyes",
+        estadoId: 1,
+        municipioId: 1,
+        nombre: "Los Reyes Acaquilpan"
+    },
+
+    {
+        id: 2,
+        ciudad: "Chimalhuacán",
+        estadoId: 1,
+        municipioId: 2,
+        nombre: "Chimalhuacán"
+    },
+
+    {
+        id: 3,
+        ciudad: "Iztapalapa",
+        estadoId: 2,
+        municipioId: 4,
+        nombre: "Iztapalapa"
+    }
+
+];
+
+
+
+/* ================= TIPO ASENTAMIENTO ================= */
+
+let tiposAsentamiento = [
+
+    {
+        id: 1,
+        nombre: "Colonia"
+    },
+
+    {
+        id: 2,
+        nombre: "Fraccionamiento"
+    },
+
+    {
+        id: 3,
+        nombre: "Barrio"
+    },
+
+    {
+        id: 4,
+        nombre: "Pueblo"
+    }
+
+];
+
+
+
+/* ================= CÓDIGOS POSTALES ================= */
+
+let codigosPostales = [
+
+    {
+        id: 1,
+        nombre: "56400"
+    },
+
+    {
+        id: 2,
+        nombre: "56300"
+    },
+
+    {
+        id: 3,
+        nombre: "57700"
+    },
+
+    {
+        id: 4,
+        nombre: "09000"
+    }
+
+];
+
+
+
+/* ================= ASENTAMIENTOS ================= */
+
+let asentamientos = [
+
+    {
+        id: 1,
+
+        municipioId: 1,
+
+        codigoPostal: "56400",
+
+        nombre: "Los Reyes Centro",
+
+        estadoId: 1
+    },
+
+
+    {
+        id: 2,
+
+        municipioId: 1,
+
+        codigoPostal: "56400",
+
+        nombre: "Valle de los Reyes",
+
+        estadoId: 1
+    },
+
+
+    {
+        id: 3,
+
+        municipioId: 2,
+
+        codigoPostal: "56300",
+
+        nombre: "Chimalhuacán Centro",
+
+        estadoId: 1
+    },
+
+
+    {
+        id: 4,
+
+        municipioId: 4,
+
+        codigoPostal: "09000",
+
+        nombre: "Iztapalapa Centro",
+
+        estadoId: 2
+    }
+
+];
+
+
+
+/* ================= ZONAS ================= */
+
+let zonas = [
+
+    {
+        id: 1,
+        nombre: "Zona Centro"
+    },
+
+    {
+        id: 2,
+        nombre: "Zona Norte"
+    },
+
+    {
+        id: 3,
+        nombre: "Zona Sur"
+    },
+
+    {
+        id: 4,
+        nombre: "Zona Oriente"
+    }
+
+];
+
+/* ============================================================
+   IR DEL INICIO AL LOGIN
+============================================================ */
+
+function irAlLogin() {
+
+    document
+        .getElementById("bienvenida")
+        .classList
+        .add("oculto");
+
+
+    document
+        .getElementById("login")
+        .classList
+        .remove("oculto");
+
+}
+
+
+/* ============================================================
+   LOGIN
+============================================================ */
+
+function iniciarSesion() {
+
+    const usuario =
+        document
+            .getElementById("usuario")
+            .value
+            .trim();
+
+
+    const contrasena =
+        document
+            .getElementById("contrasena")
+            .value;
+
+
+    if (
+        usuario === "admin" &&
+        contrasena === "1234"
+    ) {
+
+        document
+            .getElementById("login")
+            .classList
+            .add("oculto");
+
+
+        document
+            .getElementById("principal")
+            .classList
+            .remove("oculto");
+
+    }
+
+    else {
+
+        mostrarModal(
+
+            "MENSAJE DE ERROR",
+
+            "Usuario o contraseña incorrectos."
+
+        );
+
+    }
+
+}
+
+
+
+/* ============================================================
+   OCULTAR TODAS LAS VENTANAS
+============================================================ */
+
+function ocultarTodo() {
+
+    const ventanas = [
+
+        "principal",
+
+        "ventanaEstado",
+
+        "ventanaMunicipio",
+
+        "ventanaCiudad",
+
+        "ventanaTipoAsentamiento",
+
+        "ventanaAsentamiento",
+
+        "ventanaZona",
+
+        "ventanaCodigoPostal"
+
+    ];
+
+
+    ventanas.forEach(id => {
+
+        document
+            .getElementById(id)
+            .classList
+            .add("oculto");
+
+    });
+
+}
+
+
+
+/* ============================================================
+   VOLVER AL MENU PRINCIPAL
+============================================================ */
+
+function volverPrincipal() {
+
+    ocultarTodo();
+
+
+    document
+        .getElementById("principal")
+        .classList
+        .remove("oculto");
+
+}
+
+
+
+/* ============================================================
+   CERRAR SESIÓN
+============================================================ */
+
+function cerrarSesion() {
+
+    ocultarTodo();
+
+
+    document
+        .getElementById("login")
+        .classList
+        .remove("oculto");
+
+
+    document
+        .getElementById("usuario")
+        .value = "";
+
+
+    document
+        .getElementById("contrasena")
+        .value = "";
+
+}
+
+
+
+/* ============================================================
+   ABRIR ESTADO
+============================================================ */
+
+function abrirEstado() {
+
+    ocultarTodo();
+
+
+    document
+        .getElementById("ventanaEstado")
+        .classList
+        .remove("oculto");
+
+
+    cargarEstados();
+
+}
+
+
+
+/* ============================================================
+   ESTADO - TABLA
+============================================================ */
+
+function cargarEstados() {
+
+    const tabla =
+        document
+            .getElementById("tablaEstados");
+
+
+    tabla.innerHTML = "";
+
+
+    estados.forEach(estado => {
+
+        const fila =
+            document.createElement("tr");
+
+
+        fila.innerHTML = `
+
+            <td>${estado.id}</td>
+
+            <td>${estado.nombre}</td>
+
+        `;
+
+
+        fila.onclick = function() {
+
+            document
+                .getElementById("estadoId")
+                .value = estado.id;
+
+
+            document
+                .getElementById("estadoNombre")
+                .value = estado.nombre;
+
+        };
+
+
+        tabla.appendChild(fila);
+
+    });
+
+}
+
+
+
+/* ============================================================
+   ESTADO - AGREGAR
+============================================================ */
+
+function agregarEstado() {
+
+    const id =
+        Number(
+            document
+                .getElementById("estadoId")
+                .value
+        );
+
+
+    const nombre =
+        document
+            .getElementById("estadoNombre")
+            .value
+            .trim();
+
+
+    if (!id || !nombre) {
+
+        mostrarModal(
+            "MENSAJE DE ERROR",
+            "Debes completar todos los campos."
+        );
+
+        return;
+
+    }
+
+
+    if (
+        estados.some(e => e.id === id)
+    ) {
+
+        mostrarModal(
+            "MENSAJE DE ERROR",
+            "El ID ya existe."
+        );
+
+        return;
+
+    }
+
+
+    estados.push({
+
+        id: id,
+
+        nombre: nombre
+
+    });
+
+
+    cargarEstados();
+
+
+    mostrarModal(
+        "CONFIRMACIÓN",
+        "El estado fue agregado correctamente."
+    );
+
+}
+
+
+
+/* ============================================================
+   ESTADO - ACTUALIZAR
+============================================================ */
+
+function actualizarEstado() {
+
+    const id =
+        Number(
+            document
+                .getElementById("estadoId")
+                .value
+        );
+
+
+    const nombre =
+        document
+            .getElementById("estadoNombre")
+            .value
+            .trim();
+
+
+    const estado =
+        estados.find(e => e.id === id);
+
+
+    if (!estado) {
+
+        mostrarModal(
+            "MENSAJE DE ERROR",
+            "El estado no existe."
+        );
+
+        return;
+
+    }
+
+
+    if (!nombre) {
+
+        mostrarModal(
+            "MENSAJE DE ERROR",
+            "Debes ingresar un nombre."
+        );
+
+        return;
+
+    }
+
+
+    estado.nombre = nombre;
+
+
+    cargarEstados();
+
+
+    mostrarModal(
+        "CONFIRMACIÓN",
+        "El estado fue actualizado correctamente."
+    );
+
+}
+
+
+
+/* ============================================================
+   ESTADO - ELIMINAR
+============================================================ */
+
+function eliminarEstado() {
+
+    const id =
+        Number(
+            document
+                .getElementById("estadoId")
+                .value
+        );
+
+
+    const posicion =
+        estados.findIndex(e => e.id === id);
+
+
+    if (posicion === -1) {
+
+        mostrarModal(
+            "MENSAJE DE ERROR",
+            "El estado no existe."
+        );
+
+        return;
+
+    }
+
+
+    estados.splice(posicion, 1);
+
+
+    cargarEstados();
+
+
+    mostrarModal(
+        "CONFIRMACIÓN",
+        "El estado fue eliminado correctamente."
+    );
+
+}
+
+
+
+/* ============================================================
+   ABRIR MUNICIPIO
+============================================================ */
+
+function abrirMunicipio() {
+
+    ocultarTodo();
+
+
+    document
+        .getElementById("ventanaMunicipio")
+        .classList
+        .remove("oculto");
+
+
+    cargarEstadosMunicipio();
+
+    cargarMunicipios();
+
+}
+
+
+
+/* ============================================================
+   MUNICIPIO - COMBOBOX ESTADO
+============================================================ */
+
+function cargarEstadosMunicipio() {
+
+    const select =
+        document
+            .getElementById("municipioEstado");
+
+
+    select.innerHTML = "";
+
+
+    estados.forEach(estado => {
+
+        const opcion =
+            document.createElement("option");
+
+
+        opcion.value = estado.id;
+
+        opcion.textContent = estado.nombre;
+
+
+        select.appendChild(opcion);
+
+    });
+
+}
+
+
+
+/* ============================================================
+   MUNICIPIO - TABLA
+============================================================ */
+
+function cargarMunicipios() {
+
+    const tabla =
+        document
+            .getElementById("tablaMunicipios");
+
+
+    tabla.innerHTML = "";
+
+
+    municipios.forEach(municipio => {
+
+        const estado =
+            estados.find(
+                e => e.id === municipio.estadoId
+            );
+
+
+        const fila =
+            document.createElement("tr");
+
+
+        fila.innerHTML = `
+
+            <td>${municipio.id}</td>
+
+            <td>
+                ${estado ? estado.nombre : ""}
+            </td>
+
+            <td>${municipio.nombre}</td>
+
+        `;
+
+
+        fila.onclick = function() {
+
+            document
+                .getElementById("municipioId")
+                .value = municipio.id;
+
+
+            document
+                .getElementById("municipioEstado")
+                .value = municipio.estadoId;
+
+
+            document
+                .getElementById("municipioNombre")
+                .value = municipio.nombre;
+
+        };
+
+
+        tabla.appendChild(fila);
+
+    });
+
+}
+
+
+
+/* ============================================================
+   MUNICIPIO - AGREGAR
+============================================================ */
+
+function agregarMunicipio() {
+
+    const id =
+        Number(
+            document
+                .getElementById("municipioId")
+                .value
+        );
+
+
+    const estadoId =
+        Number(
+            document
+                .getElementById("municipioEstado")
+                .value
+        );
+
+
+    const nombre =
+        document
+            .getElementById("municipioNombre")
+            .value
+            .trim();
+
+
+    if (!id || !estadoId || !nombre) {
+
+        mostrarModal(
+            "MENSAJE DE ERROR",
+            "Debes completar todos los campos."
+        );
+
+        return;
+
+    }
+
+
+    if (
+        municipios.some(m => m.id === id)
+    ) {
+
+        mostrarModal(
+            "MENSAJE DE ERROR",
+            "El ID ya existe."
+        );
+
+        return;
+
+    }
+
+
+    municipios.push({
+
+        id: id,
+
+        estadoId: estadoId,
+
+        nombre: nombre
+
+    });
+
+
+    cargarMunicipios();
+
+
+    mostrarModal(
+        "CONFIRMACIÓN",
+        "El municipio fue agregado correctamente."
+    );
+
+}
+
+
+
+/* ============================================================
+   MUNICIPIO - ACTUALIZAR
+============================================================ */
+
+function actualizarMunicipio() {
+
+    const id =
+        Number(
+            document
+                .getElementById("municipioId")
+                .value
+        );
+
+
+    const estadoId =
+        Number(
+            document
+                .getElementById("municipioEstado")
+                .value
+        );
+
+
+    const nombre =
+        document
+            .getElementById("municipioNombre")
+            .value
+            .trim();
+
+
+    const municipio =
+        municipios.find(m => m.id === id);
+
+
+    if (!municipio) {
+
+        mostrarModal(
+            "MENSAJE DE ERROR",
+            "El municipio no existe."
+        );
+
+        return;
+
+    }
+
+
+    municipio.estadoId = estadoId;
+
+    municipio.nombre = nombre;
+
+
+    cargarMunicipios();
+
+
+    mostrarModal(
+        "CONFIRMACIÓN",
+        "El municipio fue actualizado correctamente."
+    );
+
+}
+
+
+
+/* ============================================================
+   MUNICIPIO - ELIMINAR
+============================================================ */
+
+function eliminarMunicipio() {
+
+    const id =
+        Number(
+            document
+                .getElementById("municipioId")
+                .value
+        );
+
+
+    const posicion =
+        municipios.findIndex(m => m.id === id);
+
+
+    if (posicion === -1) {
+
+        mostrarModal(
+            "MENSAJE DE ERROR",
+            "El municipio no existe."
+        );
+
+        return;
+
+    }
+
+
+    municipios.splice(posicion, 1);
+
+
+    cargarMunicipios();
+
+
+    mostrarModal(
+        "CONFIRMACIÓN",
+        "El municipio fue eliminado correctamente."
+    );
+
+}
+
+
+
+/* ============================================================
+   ABRIR CIUDAD
+============================================================ */
+
+function abrirCiudad() {
+
+    ocultarTodo();
+
+
+    document
+        .getElementById("ventanaCiudad")
+        .classList
+        .remove("oculto");
+
+
+    cargarEstadosCiudad();
+
+    cargarCiudades();
+
+}
+
+
+
+/* ============================================================
+   CIUDAD - ESTADOS
+============================================================ */
+
+function cargarEstadosCiudad() {
+
+    const select =
+        document
+            .getElementById("ciudadEstado");
+
+
+    select.innerHTML = "";
+
+
+    estados.forEach(estado => {
+
+        const opcion =
+            document.createElement("option");
+
+
+        opcion.value = estado.id;
+
+        opcion.textContent = estado.nombre;
+
+
+        select.appendChild(opcion);
+
+    });
+
+
+    cargarMunicipiosCiudad();
+
+}
+
+
+
+/* ============================================================
+   CIUDAD - MUNICIPIOS DEPENDIENTES
+============================================================ */
+
+function cargarMunicipiosCiudad() {
+
+    const estadoId =
+        Number(
+            document
+                .getElementById("ciudadEstado")
+                .value
+        );
+
+
+    const select =
+        document
+            .getElementById("ciudadMunicipio");
+
+
+    select.innerHTML = "";
+
+
+    municipios
+        .filter(m => m.estadoId === estadoId)
+        .forEach(municipio => {
+
+            const opcion =
+                document.createElement("option");
+
+
+            opcion.value = municipio.id;
+
+            opcion.textContent = municipio.nombre;
+
+
+            select.appendChild(opcion);
+
+        });
+
+}
+
+
+
+/* ============================================================
+   CIUDAD - TABLA
+============================================================ */
+
+function cargarCiudades() {
+
+    const tabla =
+        document
+            .getElementById("tablaCiudades");
+
+
+    tabla.innerHTML = "";
+
+
+    ciudades.forEach(ciudad => {
+
+        const estado =
+            estados.find(
+                e => e.id === ciudad.estadoId
+            );
+
+
+        const municipio =
+            municipios.find(
+                m => m.id === ciudad.municipioId
+            );
+
+
+        const fila =
+            document.createElement("tr");
+
+
+        fila.innerHTML = `
+
+            <td>${ciudad.id}</td>
+
+            <td>${ciudad.ciudad}</td>
+
+            <td>
+                ${estado ? estado.nombre : ""}
+            </td>
+
+            <td>
+                ${municipio ? municipio.nombre : ""}
+            </td>
+
+            <td>${ciudad.nombre}</td>
+
+        `;
+
+
+        fila.onclick = function() {
+
+            document
+                .getElementById("ciudadId")
+                .value = ciudad.id;
+
+
+            document
+                .getElementById("ciudadCiudad")
+                .value = ciudad.ciudad;
+
+
+            document
+                .getElementById("ciudadEstado")
+                .value = ciudad.estadoId;
+
+
+            cargarMunicipiosCiudad();
+
+
+            document
+                .getElementById("ciudadMunicipio")
+                .value = ciudad.municipioId;
+
+
+            document
+                .getElementById("ciudadNombre")
+                .value = ciudad.nombre;
+
+        };
+
+
+        tabla.appendChild(fila);
+
+    });
+
+}
+
+
+
+/* ============================================================
+   CIUDAD - AGREGAR
+============================================================ */
+
+function agregarCiudad() {
+
+    const id =
+        Number(
+            document
+                .getElementById("ciudadId")
+                .value
+        );
+
+
+    const ciudadTexto =
+        document
+            .getElementById("ciudadCiudad")
+            .value
+            .trim();
+
+
+    const estadoId =
+        Number(
+            document
+                .getElementById("ciudadEstado")
+                .value
+        );
+
+
+    const municipioId =
+        Number(
+            document
+                .getElementById("ciudadMunicipio")
+                .value
+        );
+
+
+    const nombre =
+        document
+            .getElementById("ciudadNombre")
+            .value
+            .trim();
+
+
+    if (
+        !id ||
+        !ciudadTexto ||
+        !estadoId ||
+        !municipioId ||
+        !nombre
+    ) {
+
+        mostrarModal(
+            "MENSAJE DE ERROR",
+            "Debes completar todos los campos."
+        );
+
+        return;
+
+    }
+
+
+    if (
+        ciudades.some(c => c.id === id)
+    ) {
+
+        mostrarModal(
+            "MENSAJE DE ERROR",
+            "El ID ya existe."
+        );
+
+        return;
+
+    }
+
+
+    ciudades.push({
+
+        id: id,
+
+        ciudad: ciudadTexto,
+
+        estadoId: estadoId,
+
+        municipioId: municipioId,
+
+        nombre: nombre
+
+    });
+
+
+    cargarCiudades();
+
+
+    mostrarModal(
+        "CONFIRMACIÓN",
+        "La ciudad fue agregada correctamente."
+    );
+
+}
+
+
+
+/* ============================================================
+   CIUDAD - ACTUALIZAR
+============================================================ */
+
+function actualizarCiudad() {
+
+    const id =
+        Number(
+            document
+                .getElementById("ciudadId")
+                .value
+        );
+
+
+    const ciudadTexto =
+        document
+            .getElementById("ciudadCiudad")
+            .value
+            .trim();
+
+
+    const estadoId =
+        Number(
+            document
+                .getElementById("ciudadEstado")
+                .value
+        );
+
+
+    const municipioId =
+        Number(
+            document
+                .getElementById("ciudadMunicipio")
+                .value
+        );
+
+
+    const nombre =
+        document
+            .getElementById("ciudadNombre")
+            .value
+            .trim();
+
+
+    const ciudad =
+        ciudades.find(c => c.id === id);
+
+
+    if (!ciudad) {
+
+        mostrarModal(
+            "MENSAJE DE ERROR",
+            "La ciudad no existe."
+        );
+
+        return;
+
+    }
+
+
+    ciudad.ciudad = ciudadTexto;
+
+    ciudad.estadoId = estadoId;
+
+    ciudad.municipioId = municipioId;
+
+    ciudad.nombre = nombre;
+
+
+    cargarCiudades();
+
+
+    mostrarModal(
+        "CONFIRMACIÓN",
+        "La ciudad fue actualizada correctamente."
+    );
+
+}
+
+
+
+/* ============================================================
+   CIUDAD - ELIMINAR
+============================================================ */
+
+function eliminarCiudad() {
+
+    const id =
+        Number(
+            document
+                .getElementById("ciudadId")
+                .value
+        );
+
+
+    const posicion =
+        ciudades.findIndex(c => c.id === id);
+
+
+    if (posicion === -1) {
+
+        mostrarModal(
+            "MENSAJE DE ERROR",
+            "La ciudad no existe."
+        );
+
+        return;
+
+    }
+
+
+    ciudades.splice(posicion, 1);
+
+
+    cargarCiudades();
+
+
+    mostrarModal(
+        "CONFIRMACIÓN",
+        "La ciudad fue eliminada correctamente."
+    );
+
+}
+
+
+
+/* ============================================================
+   ABRIR TIPO ASENTAMIENTO
+============================================================ */
+
+function abrirTipoAsentamiento() {
+
+    ocultarTodo();
+
+
+    document
+        .getElementById("ventanaTipoAsentamiento")
+        .classList
+        .remove("oculto");
+
+
+    cargarTiposAsentamiento();
+
+}
+
+
+
+/* ============================================================
+   TIPO ASENTAMIENTO - TABLA
+============================================================ */
+
+function cargarTiposAsentamiento() {
+
+    const tabla =
+        document
+            .getElementById(
+                "tablaTiposAsentamiento"
+            );
+
+
+    tabla.innerHTML = "";
+
+
+    tiposAsentamiento.forEach(tipo => {
+
+        const fila =
+            document.createElement("tr");
+
+
+        fila.innerHTML = `
+
+            <td>${tipo.id}</td>
+
+            <td>${tipo.nombre}</td>
+
+        `;
+
+
+        fila.onclick = function() {
+
+            document
+                .getElementById(
+                    "tipoAsentamientoId"
+                )
+                .value = tipo.id;
+
+
+            document
+                .getElementById(
+                    "tipoAsentamientoNombre"
+                )
+                .value = tipo.nombre;
+
+        };
+
+
+        tabla.appendChild(fila);
+
+    });
+
+}
+
+
+
+/* ============================================================
+   TIPO ASENTAMIENTO - AGREGAR
+============================================================ */
+
+function agregarTipoAsentamiento() {
+
+    const id =
+        Number(
+            document
+                .getElementById(
+                    "tipoAsentamientoId"
+                )
+                .value
+        );
+
+
+    const nombre =
+        document
+            .getElementById(
+                "tipoAsentamientoNombre"
+            )
+            .value
+            .trim();
+
+
+    if (!id || !nombre) {
+
+        mostrarModal(
+            "MENSAJE DE ERROR",
+            "Debes completar todos los campos."
+        );
+
+        return;
+
+    }
+
+
+    if (
+        tiposAsentamiento.some(
+            t => t.id === id
+        )
+    ) {
+
+        mostrarModal(
+            "MENSAJE DE ERROR",
+            "El ID ya existe."
+        );
+
+        return;
+
+    }
+
+
+    tiposAsentamiento.push({
+
+        id: id,
+
+        nombre: nombre
+
+    });
+
+
+    cargarTiposAsentamiento();
+
+
+    mostrarModal(
+        "CONFIRMACIÓN",
+        "El tipo de asentamiento fue agregado correctamente."
+    );
+
+}
+
+
+
+/* ============================================================
+   TIPO ASENTAMIENTO - ACTUALIZAR
+============================================================ */
+
+function actualizarTipoAsentamiento() {
+
+    const id =
+        Number(
+            document
+                .getElementById(
+                    "tipoAsentamientoId"
+                )
+                .value
+        );
+
+
+    const nombre =
+        document
+            .getElementById(
+                "tipoAsentamientoNombre"
+            )
+            .value
+            .trim();
+
+
+    const tipo =
+        tiposAsentamiento.find(
+            t => t.id === id
+        );
+
+
+    if (!tipo) {
+
+        mostrarModal(
+            "MENSAJE DE ERROR",
+            "El tipo de asentamiento no existe."
+        );
+
+        return;
+
+    }
+
+
+    tipo.nombre = nombre;
+
+
+    cargarTiposAsentamiento();
+
+
+    mostrarModal(
+        "CONFIRMACIÓN",
+        "El tipo de asentamiento fue actualizado correctamente."
+    );
+
+}
+
+
+
+/* ============================================================
+   TIPO ASENTAMIENTO - ELIMINAR
+============================================================ */
+
+function eliminarTipoAsentamiento() {
+
+    const id =
+        Number(
+            document
+                .getElementById(
+                    "tipoAsentamientoId"
+                )
+                .value
+        );
+
+
+    const posicion =
+        tiposAsentamiento.findIndex(
+            t => t.id === id
+        );
+
+
+    if (posicion === -1) {
+
+        mostrarModal(
+            "MENSAJE DE ERROR",
+            "El tipo de asentamiento no existe."
+        );
+
+        return;
+
+    }
+
+
+    tiposAsentamiento.splice(posicion, 1);
+
+
+    cargarTiposAsentamiento();
+
+
+    mostrarModal(
+        "CONFIRMACIÓN",
+        "El tipo de asentamiento fue eliminado correctamente."
+    );
+
+}
+
+
+
+/* ============================================================
+   ABRIR ASENTAMIENTO
+============================================================ */
+
+function abrirAsentamiento() {
+
+    ocultarTodo();
+
+
+    document
+        .getElementById("ventanaAsentamiento")
+        .classList
+        .remove("oculto");
+
+
+    cargarEstadosAsentamiento();
+
+    cargarMunicipiosAsentamiento();
+
+    cargarAsentamientos();
+
+}
+
+
+
+/* ============================================================
+   ASENTAMIENTO - ESTADOS
+============================================================ */
+
+function cargarEstadosAsentamiento() {
+
+    const select =
+        document
+            .getElementById(
+                "asentamientoEstado"
+            );
+
+
+    select.innerHTML = "";
+
+
+    estados.forEach(estado => {
+
+        const opcion =
+            document.createElement("option");
+
+
+        opcion.value = estado.id;
+
+        opcion.textContent = estado.nombre;
+
+
+        select.appendChild(opcion);
+
+    });
+
+}
+
+
+
+/* ============================================================
+   ASENTAMIENTO - MUNICIPIOS
+============================================================ */
+
+function cargarMunicipiosAsentamiento() {
+
+    const select =
+        document
+            .getElementById(
+                "asentamientoMunicipio"
+            );
+
+
+    select.innerHTML = "";
+
+
+    municipios.forEach(municipio => {
+
+        const estado =
+            estados.find(
+                e => e.id === municipio.estadoId
+            );
+
+
+        const opcion =
+            document.createElement("option");
+
+
+        opcion.value = municipio.id;
+
+
+        opcion.textContent =
+            estado
+                ? municipio.nombre +
+                  " - " +
+                  estado.nombre
+
+                : municipio.nombre;
+
+
+        select.appendChild(opcion);
+
+    });
+
+}
+
+
+
+/* ============================================================
+   ASENTAMIENTO - TABLA
+============================================================ */
+
+function cargarAsentamientos(lista = asentamientos) {
+
+    const tabla =
+        document
+            .getElementById(
+                "tablaAsentamientos"
+            );
+
+
+    tabla.innerHTML = "";
+
+
+    if (lista.length === 0) {
+
+        tabla.innerHTML = `
+
+            <tr>
+
+                <td
+                    colspan="5"
+                    class="sin-resultados"
+                >
+                    No se encontraron resultados.
+                </td>
+
+            </tr>
+
+        `;
+
+        return;
+
+    }
+
+
+    lista.forEach(asentamiento => {
+
+        const municipio =
+            municipios.find(
+                m =>
+                    m.id ===
+                    asentamiento.municipioId
+            );
+
+
+        const estado =
+            estados.find(
+                e =>
+                    e.id ===
+                    asentamiento.estadoId
+            );
+
+
+        const fila =
+            document.createElement("tr");
+
+
+        fila.innerHTML = `
+
+            <td>
+                ${asentamiento.id}
+            </td>
+
+            <td>
+                ${
+                    municipio
+                        ? municipio.nombre
+                        : ""
+                }
+            </td>
+
+            <td>
+                ${asentamiento.codigoPostal}
+            </td>
+
+            <td>
+                ${asentamiento.nombre}
+            </td>
+
+            <td>
+                ${
+                    estado
+                        ? estado.nombre
+                        : ""
+                }
+            </td>
+
+        `;
+
+
+        fila.onclick = function() {
+
+            document
+                .getElementById(
+                    "asentamientoId"
+                )
+                .value =
+                    asentamiento.id;
+
+
+            document
+                .getElementById(
+                    "asentamientoMunicipio"
+                )
+                .value =
+                    asentamiento.municipioId;
+
+
+            document
+                .getElementById(
+                    "asentamientoCodigoPostal"
+                )
+                .value =
+                    asentamiento.codigoPostal;
+
+
+            document
+                .getElementById(
+                    "asentamientoNombre"
+                )
+                .value =
+                    asentamiento.nombre;
+
+
+            document
+                .getElementById(
+                    "asentamientoEstado"
+                )
+                .value =
+                    asentamiento.estadoId;
+
+        };
+
+
+        tabla.appendChild(fila);
+
+    });
+
+}
+
+
+
+/* ============================================================
+   ASENTAMIENTO - BUSCAR
+============================================================ */
+
+function buscarAsentamiento() {
+
+    const texto =
+        document
+            .getElementById(
+                "buscarAsentamiento"
+            )
+            .value
+            .toLowerCase()
+            .trim();
+
+
+    if (texto === "") {
+
+        cargarAsentamientos();
+
+        return;
+
+    }
+
+
+    const resultados =
+        asentamientos.filter(asentamiento => {
+
+            const municipio =
+                municipios.find(
+                    m =>
+                        m.id ===
+                        asentamiento.municipioId
+                );
+
+
+            const estado =
+                estados.find(
+                    e =>
+                        e.id ===
+                        asentamiento.estadoId
+                );
+
+
+            const datos = [
+
+                asentamiento.id,
+
+                asentamiento.codigoPostal,
+
+                asentamiento.nombre,
+
+                municipio
+                    ? municipio.nombre
+                    : "",
+
+                estado
+                    ? estado.nombre
+                    : ""
+
+            ]
+            .join(" ")
+            .toLowerCase();
+
+
+            return datos.includes(texto);
+
+        });
+
+
+    cargarAsentamientos(resultados);
+
+}
+
+
+
+/* ============================================================
+   ASENTAMIENTO - AGREGAR
+============================================================ */
+
+function agregarAsentamiento() {
+
+    const id =
+        Number(
+            document
+                .getElementById(
+                    "asentamientoId"
+                )
+                .value
+        );
+
+
+    const municipioId =
+        Number(
+            document
+                .getElementById(
+                    "asentamientoMunicipio"
+                )
+                .value
+        );
+
+
+    const codigoPostal =
+        document
+            .getElementById(
+                "asentamientoCodigoPostal"
+            )
+            .value
+            .trim();
+
+
+    const nombre =
+        document
+            .getElementById(
+                "asentamientoNombre"
+            )
+            .value
+            .trim();
+
+
+    const estadoId =
+        Number(
+            document
+                .getElementById(
+                    "asentamientoEstado"
+                )
+                .value
+        );
+
+
+    if (
+        !id ||
+        !municipioId ||
+        !codigoPostal ||
+        !nombre ||
+        !estadoId
+    ) {
+
+        mostrarModal(
+            "MENSAJE DE ERROR",
+            "Debes completar todos los campos."
+        );
+
+        return;
+
+    }
+
+
+    if (
+        asentamientos.some(
+            a => a.id === id
+        )
+    ) {
+
+        mostrarModal(
+            "MENSAJE DE ERROR",
+            "El ID ya existe."
+        );
+
+        return;
+
+    }
+
+
+    asentamientos.push({
+
+        id: id,
+
+        municipioId: municipioId,
+
+        codigoPostal: codigoPostal,
+
+        nombre: nombre,
+
+        estadoId: estadoId
+
+    });
+
+
+    cargarAsentamientos();
+
+
+    mostrarModal(
+        "CONFIRMACIÓN",
+        "El asentamiento fue agregado correctamente."
+    );
+
+}
+
+
+
+/* ============================================================
+   ASENTAMIENTO - ACTUALIZAR
+============================================================ */
+
+function actualizarAsentamiento() {
+
+    const id =
+        Number(
+            document
+                .getElementById(
+                    "asentamientoId"
+                )
+                .value
+        );
+
+
+    const municipioId =
+        Number(
+            document
+                .getElementById(
+                    "asentamientoMunicipio"
+                )
+                .value
+        );
+
+
+    const codigoPostal =
+        document
+            .getElementById(
+                "asentamientoCodigoPostal"
+            )
+            .value
+            .trim();
+
+
+    const nombre =
+        document
+            .getElementById(
+                "asentamientoNombre"
+            )
+            .value
+            .trim();
+
+
+    const estadoId =
+        Number(
+            document
+                .getElementById(
+                    "asentamientoEstado"
+                )
+                .value
+        );
+
+
+    const asentamiento =
+        asentamientos.find(
+            a => a.id === id
+        );
+
+
+    if (!asentamiento) {
+
+        mostrarModal(
+            "MENSAJE DE ERROR",
+            "El asentamiento no existe."
+        );
+
+        return;
+
+    }
+
+
+    asentamiento.municipioId =
+        municipioId;
+
+
+    asentamiento.codigoPostal =
+        codigoPostal;
+
+
+    asentamiento.nombre =
+        nombre;
+
+
+    asentamiento.estadoId =
+        estadoId;
+
+
+    cargarAsentamientos();
+
+
+    mostrarModal(
+        "CONFIRMACIÓN",
+        "El asentamiento fue actualizado correctamente."
+    );
+
+}
+
+
+
+/* ============================================================
+   ASENTAMIENTO - ELIMINAR
+============================================================ */
+
+function eliminarAsentamiento() {
+
+    const id =
+        Number(
+            document
+                .getElementById(
+                    "asentamientoId"
+                )
+                .value
+        );
+
+
+    const posicion =
+        asentamientos.findIndex(
+            a => a.id === id
+        );
+
+
+    if (posicion === -1) {
+
+        mostrarModal(
+            "MENSAJE DE ERROR",
+            "El asentamiento no existe."
+        );
+
+        return;
+
+    }
+
+
+    asentamientos.splice(posicion, 1);
+
+
+    cargarAsentamientos();
+
+
+    mostrarModal(
+        "CONFIRMACIÓN",
+        "El asentamiento fue eliminado correctamente."
+    );
+
+}
+
+
+
+/* ============================================================
+   ABRIR ZONA
+============================================================ */
+
+function abrirZona() {
+
+    ocultarTodo();
+
+
+    document
+        .getElementById("ventanaZona")
+        .classList
+        .remove("oculto");
+
+
+    cargarZonas();
+
+}
+
+
+
+/* ============================================================
+   ZONA - TABLA
+============================================================ */
+
+function cargarZonas() {
+
+    const tabla =
+        document
+            .getElementById("tablaZonas");
+
+
+    tabla.innerHTML = "";
+
+
+    zonas.forEach(zona => {
+
+        const fila =
+            document.createElement("tr");
+
+
+        fila.innerHTML = `
+
+            <td>${zona.id}</td>
+
+            <td>${zona.nombre}</td>
+
+        `;
+
+
+        fila.onclick = function() {
+
+            document
+                .getElementById("zonaId")
+                .value = zona.id;
+
+
+            document
+                .getElementById("zonaNombre")
+                .value = zona.nombre;
+
+        };
+
+
+        tabla.appendChild(fila);
+
+    });
+
+}
+
+
+
+/* ============================================================
+   ZONA - AGREGAR
+============================================================ */
+
+function agregarZona() {
+
+    const id =
+        Number(
+            document
+                .getElementById("zonaId")
+                .value
+        );
+
+
+    const nombre =
+        document
+            .getElementById("zonaNombre")
+            .value
+            .trim();
+
+
+    if (!id || !nombre) {
+
+        mostrarModal(
+            "MENSAJE DE ERROR",
+            "Debes completar todos los campos."
+        );
+
+        return;
+
+    }
+
+
+    if (
+        zonas.some(z => z.id === id)
+    ) {
+
+        mostrarModal(
+            "MENSAJE DE ERROR",
+            "El ID ya existe."
+        );
+
+        return;
+
+    }
+
+
+    zonas.push({
+
+        id: id,
+
+        nombre: nombre
+
+    });
+
+
+    cargarZonas();
+
+
+    mostrarModal(
+        "CONFIRMACIÓN",
+        "La zona fue agregada correctamente."
+    );
+
+}
+
+
+
+/* ============================================================
+   ZONA - ACTUALIZAR
+============================================================ */
+
+function actualizarZona() {
+
+    const id =
+        Number(
+            document
+                .getElementById("zonaId")
+                .value
+        );
+
+
+    const nombre =
+        document
+            .getElementById("zonaNombre")
+            .value
+            .trim();
+
+
+    const zona =
+        zonas.find(z => z.id === id);
+
+
+    if (!zona) {
+
+        mostrarModal(
+            "MENSAJE DE ERROR",
+            "La zona no existe."
+        );
+
+        return;
+
+    }
+
+
+    zona.nombre = nombre;
+
+
+    cargarZonas();
+
+
+    mostrarModal(
+        "CONFIRMACIÓN",
+        "La zona fue actualizada correctamente."
+    );
+
+}
+
+
+
+/* ============================================================
+   ZONA - ELIMINAR
+============================================================ */
+
+function eliminarZona() {
+
+    const id =
+        Number(
+            document
+                .getElementById("zonaId")
+                .value
+        );
+
+
+    const posicion =
+        zonas.findIndex(
+            z => z.id === id
+        );
+
+
+    if (posicion === -1) {
+
+        mostrarModal(
+            "MENSAJE DE ERROR",
+            "La zona no existe."
+        );
+
+        return;
+
+    }
+
+
+    zonas.splice(posicion, 1);
+
+
+    cargarZonas();
+
+
+    mostrarModal(
+        "CONFIRMACIÓN",
+        "La zona fue eliminada correctamente."
+    );
+
+}
+
+
+
+/* ============================================================
+   ABRIR CÓDIGO POSTAL
+============================================================ */
+
+function abrirCodigoPostal() {
+
+    ocultarTodo();
+
+
+    document
+        .getElementById(
+            "ventanaCodigoPostal"
+        )
+        .classList
+        .remove("oculto");
+
+
+    cargarCodigosPostales();
+
+}
+
+
+
+/* ============================================================
+   CÓDIGO POSTAL - TABLA
+============================================================ */
+
+function cargarCodigosPostales() {
+
+    const tabla =
+        document
+            .getElementById(
+                "tablaCodigosPostales"
+            );
+
+
+    tabla.innerHTML = "";
+
+
+    codigosPostales.forEach(codigo => {
+
+        const fila =
+            document.createElement("tr");
+
+
+        fila.innerHTML = `
+
+            <td>${codigo.id}</td>
+
+            <td>${codigo.nombre}</td>
+
+        `;
+
+
+        fila.onclick = function() {
+
+            document
+                .getElementById(
+                    "codigoPostalId"
+                )
+                .value = codigo.id;
+
+
+            document
+                .getElementById(
+                    "codigoPostalNombre"
+                )
+                .value = codigo.nombre;
+
+        };
+
+
+        tabla.appendChild(fila);
+
+    });
+
+}
+
+
+
+/* ============================================================
+   CÓDIGO POSTAL - AGREGAR
+============================================================ */
+
+function agregarCodigoPostal() {
+
+    const id =
+        Number(
+            document
+                .getElementById(
+                    "codigoPostalId"
+                )
+                .value
+        );
+
+
+    const nombre =
+        document
+            .getElementById(
+                "codigoPostalNombre"
+            )
+            .value
+            .trim();
+
+
+    if (!id || !nombre) {
+
+        mostrarModal(
+            "MENSAJE DE ERROR",
+            "Debes completar todos los campos."
+        );
+
+        return;
+
+    }
+
+
+    if (
+        codigosPostales.some(
+            c => c.id === id
+        )
+    ) {
+
+        mostrarModal(
+            "MENSAJE DE ERROR",
+            "El ID ya existe."
+        );
+
+        return;
+
+    }
+
+
+    codigosPostales.push({
+
+        id: id,
+
+        nombre: nombre
+
+    });
+
+
+    cargarCodigosPostales();
+
+
+    mostrarModal(
+        "CONFIRMACIÓN",
+        "El código postal fue agregado correctamente."
+    );
+
+}
+
+
+
+/* ============================================================
+   CÓDIGO POSTAL - ACTUALIZAR
+============================================================ */
+
+function actualizarCodigoPostal() {
+
+    const id =
+        Number(
+            document
+                .getElementById(
+                    "codigoPostalId"
+                )
+                .value
+        );
+
+
+    const nombre =
+        document
+            .getElementById(
+                "codigoPostalNombre"
+            )
+            .value
+            .trim();
+
+
+    const codigo =
+        codigosPostales.find(
+            c => c.id === id
+        );
+
+
+    if (!codigo) {
+
+        mostrarModal(
+            "MENSAJE DE ERROR",
+            "El código postal no existe."
+        );
+
+        return;
+
+    }
+
+
+    codigo.nombre = nombre;
+
+
+    cargarCodigosPostales();
+
+
+    mostrarModal(
+        "CONFIRMACIÓN",
+        "El código postal fue actualizado correctamente."
+    );
+
+}
+
+
+
+/* ============================================================
+   CÓDIGO POSTAL - ELIMINAR
+============================================================ */
+
+function eliminarCodigoPostal() {
+
+    const id =
+        Number(
+            document
+                .getElementById(
+                    "codigoPostalId"
+                )
+                .value
+        );
+
+
+    const posicion =
+        codigosPostales.findIndex(
+            c => c.id === id
+        );
+
+
+    if (posicion === -1) {
+
+        mostrarModal(
+            "MENSAJE DE ERROR",
+            "El código postal no existe."
+        );
+
+        return;
+
+    }
+
+
+    codigosPostales.splice(posicion, 1);
+
+
+    cargarCodigosPostales();
+
+
+    mostrarModal(
+        "CONFIRMACIÓN",
+        "El código postal fue eliminado correctamente."
+    );
+
+}
+
+
+
+/* ============================================================
+   MODAL
+============================================================ */
+
+function mostrarModal(titulo, mensaje) {
+
+    document
+        .getElementById("modalTitulo")
+        .innerText = titulo;
+
+
+    document
+        .getElementById("modalMensaje")
+        .innerText = mensaje;
+
+
+    document
+        .getElementById("modal")
+        .style
+        .display = "flex";
+
+}
+
+
+
+function cerrarModal() {
+
+    document
+        .getElementById("modal")
+        .style
+        .display = "none";
+
+}
+
+
+
+</script>
+
+</body>
+
+</html>
