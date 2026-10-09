@@ -1,0 +1,476 @@
+```html
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Mi Página Web</title>
+
+    <style>
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #eaf0f8;
+            text-align: center;
+        }
+
+        header {
+            background-color: #173b63;
+            color: white;
+            padding: 20px;
+        }
+
+        header h1 {
+            margin: 5px;
+        }
+
+        header p {
+            margin: 5px;
+        }
+
+        .contenedor {
+            background-color: white;
+            width: 350px;
+            max-width: 85%;
+            margin: 50px auto;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 12px #0002;
+        }
+
+        button {
+            background-color: #173b63;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 15px;
+            margin: 5px;
+        }
+
+        button:hover {
+            background-color: #285b8e;
+        }
+
+        input {
+            width: 90%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-sizing: border-box;
+        }
+
+        #login,
+        #panel {
+            display: none;
+        }
+
+        /* MENU */
+
+        nav {
+            background-color: #285b8e;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            padding: 10px;
+        }
+
+        nav button {
+            background-color: transparent;
+            margin: 4px;
+            padding: 10px 14px;
+        }
+
+        nav button:hover {
+            background-color: #173b63;
+        }
+
+        /* PANEL */
+
+        #panel {
+            width: 100%;
+            min-height: 100vh;
+            background-color: #eaf0f8;
+        }
+
+        .contenido {
+            background-color: white;
+            margin: 30px auto;
+            padding: 30px;
+            width: 80%;
+            max-width: 800px;
+            min-height: 250px;
+            border-radius: 15px;
+            box-shadow: 0 4px 12px #0002;
+        }
+
+        #mensaje {
+            color: #173b63;
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+    <!-- ==============================
+         PAGINA PRINCIPAL
+    =============================== -->
+
+    <div id="principal">
+
+        <header>
+
+            <h1>MI PÁGINA WEB</h1>
+
+            <p>Bienvenido a nuestro sitio</p>
+
+        </header>
+
+
+        <div class="contenedor">
+
+            <h2>¡Bienvenido!</h2>
+
+            <p>
+                Presiona el botón para iniciar sesión.
+            </p>
+
+
+            <button onclick="mostrarLogin()">
+
+                Iniciar sesión
+
+            </button>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- ==============================
+         INICIO DE SESION
+    =============================== -->
+
+    <div id="login">
+
+        <header>
+
+            <h1>MI PÁGINA WEB</h1>
+
+            <p>Inicio de sesión</p>
+
+        </header>
+
+
+        <div class="contenedor">
+
+            <h2>Inicio de sesión</h2>
+
+
+            <form onsubmit="iniciarSesion(event)">
+
+                <input
+                    type="text"
+                    id="usuario"
+                    placeholder="Ingresa tu usuario"
+                    required
+                >
+
+
+                <input
+                    type="password"
+                    id="contrasena"
+                    placeholder="Ingresa tu contraseña"
+                    required
+                >
+
+
+                <br>
+
+
+                <button type="submit">
+
+                    Entrar
+
+                </button>
+
+            </form>
+
+
+            <br>
+
+
+            <button onclick="regresar()">
+
+                Regresar
+
+            </button>
+
+
+            <p id="mensaje"></p>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- ==============================
+         PANEL PRINCIPAL
+    =============================== -->
+
+    <div id="panel">
+
+
+        <header>
+
+            <h1>MI PÁGINA WEB</h1>
+
+            <p>Panel principal</p>
+
+        </header>
+
+
+
+        <!-- ==============================
+             MENU
+        =============================== -->
+
+        <nav>
+
+
+            <button onclick="mostrarSeccion('Inicio')">
+                Inicio
+            </button>
+
+
+            <button onclick="mostrarSeccion('Estado')">
+                Estado
+            </button>
+
+
+            <button onclick="mostrarSeccion('Municipio')">
+                Municipio
+            </button>
+
+
+            <button onclick="mostrarSeccion('Ciudad')">
+                Ciudad
+            </button>
+
+
+            <button onclick="mostrarSeccion('TipoAsentamiento')">
+                Tipo de asentamiento
+            </button>
+
+
+            <button onclick="mostrarSeccion('Asentamiento')">
+                Asentamiento
+            </button>
+
+
+            <button onclick="mostrarSeccion('Zona')">
+                Zona
+            </button>
+
+
+            <button onclick="cerrarSesion()">
+                Cerrar sesión
+            </button>
+
+
+        </nav>
+
+
+
+        <!-- ==============================
+             CONTENIDO
+        =============================== -->
+
+        <div class="contenido">
+
+            <h2 id="tituloSeccion">
+                Bienvenido
+            </h2>
+
+
+            <p id="textoSeccion">
+                Selecciona una opción del menú.
+            </p>
+
+        </div>
+
+
+    </div>
+
+
+
+    <!-- ==============================
+         JAVASCRIPT
+    =============================== -->
+
+    <script>
+
+
+        function mostrarLogin() {
+
+            document.getElementById("principal").style.display = "none";
+
+            document.getElementById("login").style.display = "block";
+
+        }
+
+
+        function regresar() {
+
+            document.getElementById("login").style.display = "none";
+
+            document.getElementById("principal").style.display = "block";
+
+        }
+
+
+        function iniciarSesion(event) {
+
+            event.preventDefault();
+
+            let usuario =
+                document.getElementById("usuario").value;
+
+            let contrasena =
+                document.getElementById("contrasena").value;
+
+
+            if (usuario !== "" && contrasena !== "") {
+
+                document.getElementById("login").style.display = "none";
+
+                document.getElementById("panel").style.display = "block";
+
+                mostrarSeccion("Inicio");
+
+            }
+
+        }
+
+
+        function mostrarSeccion(seccion) {
+
+            let titulo =
+                document.getElementById("tituloSeccion");
+
+            let texto =
+                document.getElementById("textoSeccion");
+
+
+            if (seccion === "Inicio") {
+
+                titulo.textContent =
+                    "¡Bienvenido!";
+
+                texto.textContent =
+                    "Selecciona una opción del menú para comenzar.";
+
+            }
+
+
+            else if (seccion === "Estado") {
+
+                titulo.textContent =
+                    "Estado";
+
+                texto.textContent =
+                    "Aquí se mostrará la información de los estados.";
+
+            }
+
+
+            else if (seccion === "Municipio") {
+
+                titulo.textContent =
+                    "Municipio";
+
+                texto.textContent =
+                    "Aquí se mostrará la información de los municipios.";
+
+            }
+
+
+            else if (seccion === "Ciudad") {
+
+                titulo.textContent =
+                    "Ciudad";
+
+                texto.textContent =
+                    "Aquí se mostrará la información de las ciudades.";
+
+            }
+
+
+            else if (seccion === "TipoAsentamiento") {
+
+                titulo.textContent =
+                    "Tipo de asentamiento";
+
+                texto.textContent =
+                    "Aquí se mostrará la información de los tipos de asentamiento.";
+
+            }
+
+
+            else if (seccion === "Asentamiento") {
+
+                titulo.textContent =
+                    "Asentamiento";
+
+                texto.textContent =
+                    "Aquí se mostrará la información de los asentamientos.";
+
+            }
+
+
+            else if (seccion === "Zona") {
+
+                titulo.textContent =
+                    "Zona";
+
+                texto.textContent =
+                    "Aquí se mostrará la información de las zonas.";
+
+            }
+
+        }
+
+
+        function cerrarSesion() {
+
+            document.getElementById("panel").style.display = "none";
+
+            document.getElementById("principal").style.display = "block";
+
+            document.getElementById("usuario").value = "";
+
+            document.getElementById("contrasena").value = "";
+
+        }
+
+    </script>
+
+
+</body>
+
+</html>
+```
