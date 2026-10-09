@@ -21,12 +21,10 @@ $permitidas = [
 ];
 
 // ---------------- LISTAR AUDITORIAS (todas las tablas) ----------------
-// Se valida ANTES que la tabla, porque no manda parametro "tabla"
 if ($accion === 'listar_auditorias') {
 
     $todas = [];
 
-    // ----- audit_estado -----
     $res = $conexion->query("SELECT id_audit, accion, usuario, fecha, c_estado, nombre FROM audit_estado");
     while ($fila = $res->fetch_assoc()) {
         $fila['tabla']   = 'Estado';
@@ -34,7 +32,6 @@ if ($accion === 'listar_auditorias') {
         $todas[] = $fila;
     }
 
-    // ----- audit_municipio -----
     $res = $conexion->query("SELECT id_audit, accion, usuario, fecha, c_estado, c_municipio, nombre FROM audit_municipio");
     while ($fila = $res->fetch_assoc()) {
         $fila['tabla']   = 'Municipio';
@@ -42,7 +39,6 @@ if ($accion === 'listar_auditorias') {
         $todas[] = $fila;
     }
 
-    // ----- audit_ciudad -----
     $res = $conexion->query("SELECT id_audit, accion, usuario, fecha, c_estado, c_municipio, c_cve_ciudad, d_ciudad FROM audit_ciudad");
     while ($fila = $res->fetch_assoc()) {
         $fila['tabla']   = 'Ciudad';
@@ -50,7 +46,6 @@ if ($accion === 'listar_auditorias') {
         $todas[] = $fila;
     }
 
-    // ----- audit_tipo_asentamiento -----
     $res = $conexion->query("SELECT id_audit, accion, usuario, fecha, c_tipo_asentamiento, d_tipo_asentamiento FROM audit_tipo_asentamiento");
     while ($fila = $res->fetch_assoc()) {
         $fila['tabla']   = 'Tipo de asentamiento';
@@ -58,7 +53,6 @@ if ($accion === 'listar_auditorias') {
         $todas[] = $fila;
     }
 
-    // ----- audit_zona -----
     $res = $conexion->query("SELECT id_audit, accion, usuario, fecha, c_zona, d_zona FROM audit_zona");
     while ($fila = $res->fetch_assoc()) {
         $fila['tabla']   = 'Zona';
@@ -66,7 +60,6 @@ if ($accion === 'listar_auditorias') {
         $todas[] = $fila;
     }
 
-    // ----- audit_CP -----
     $res = $conexion->query("SELECT id_audit, accion, usuario, fecha, c_CP, d_CP FROM audit_CP");
     while ($fila = $res->fetch_assoc()) {
         $fila['tabla']   = 'Codigo postal';
@@ -74,7 +67,6 @@ if ($accion === 'listar_auditorias') {
         $todas[] = $fila;
     }
 
-    // ----- audit_asentamiento -----
     $res = $conexion->query("SELECT id_audit, accion, usuario, fecha, d_codigo, c_estado, c_municipio, id_asenta_cpcons, c_tipo_asentamiento, c_zona, c_CP, d_asenta FROM audit_asentamiento");
     while ($fila = $res->fetch_assoc()) {
         $fila['tabla']   = 'Asentamiento';
@@ -82,15 +74,12 @@ if ($accion === 'listar_auditorias') {
         $todas[] = $fila;
     }
 
-    // Ordenar por fecha descendente
     usort($todas, function($a, $b){
         return strcmp($b['fecha'], $a['fecha']);
     });
 
-    // Limitar a 500
     $todas = array_slice($todas, 0, 500);
 
-    // Limpiar campos sobrantes que no queremos mandar al front
     foreach ($todas as &$fila) {
         unset($fila['c_estado'], $fila['c_municipio'], $fila['c_cve_ciudad'],
               $fila['c_tipo_asentamiento'], $fila['c_zona'], $fila['c_CP'],
@@ -203,6 +192,86 @@ if ($accion === 'actualizar') {
     }
 
     echo json_encode(["ok" => true, "afectados" => $stmt->affected_rows]);
+    exit;
+}
+
+// ---------------- VERIFICAR USO EN OTRAS TABLAS ----------------
+if ($accion === 'verificar_uso') {
+
+    $where = $_POST['where'] ?? [];
+
+    if (empty($where) || $tabla === '') {
+        echo json_encode(["ok" => false, "error" => "Datos incompletos"]);
+        exit;
+    }
+
+    // Mapa de dependencias: que tablas dependen de cada tabla
+    $dependencias = [
+        'estado' => [
+            ['hija' => 'municipio',    'columnas' => ['c_estado']],
+            ['hija' => 'asentamiento', 'columnas' => ['c_estado']]
+        ],
+        'municipio' => [
+            ['hija' => 'ciudad',       'columnas' => ['c_estado', 'c_municipio']],
+            ['hija' => 'asentamiento', 'columnas' => ['c_estado', 'c_municipio']]
+        ],
+        'ciudad' => [],
+        'tipo_asentamiento' => [
+            ['hija' => 'asentamiento', 'columnas' => ['c_tipo_asentamiento']]
+        ],
+        'zona' => [
+            ['hija' => 'asentamiento', 'columnas' => ['c_zona']]
+        ],
+        'CP' => [
+            ['hija' => 'asentamiento', 'columnas' => ['c_CP']]
+        ],
+        'asentamiento' => []
+    ];
+
+    if (!isset($dependencias[$tabla])) {
+        echo json_encode(["ok" => true, "usos" => []]);
+        exit;
+    }
+
+    $usos = [];
+
+    foreach ($dependencias[$tabla] as $dep) {
+
+        $condiciones = [];
+        $valores = [];
+
+        foreach ($dep['columnas'] as $col) {
+            if (!isset($where[$col])) {
+                $condiciones = [];
+                break;
+            }
+            $condiciones[] = "`$col` = ?";
+            $valores[] = $where[$col];
+        }
+
+        if (empty($condiciones)) continue;
+
+        $sql = "SELECT COUNT(*) AS total FROM `{$dep['hija']}` WHERE " . implode(" AND ", $condiciones);
+        $stmt = $conexion->prepare($sql);
+
+        if (!$stmt) continue;
+
+        $tipos = str_repeat("s", count($valores));
+        $stmt->bind_param($tipos, ...$valores);
+        $stmt->execute();
+
+        $res = $stmt->get_result();
+        $fila = $res->fetch_assoc();
+
+        if ($fila['total'] > 0) {
+            $usos[] = [
+                'tabla' => $dep['hija'],
+                'total' => $fila['total']
+            ];
+        }
+    }
+
+    echo json_encode(["ok" => true, "usos" => $usos]);
     exit;
 }
 
