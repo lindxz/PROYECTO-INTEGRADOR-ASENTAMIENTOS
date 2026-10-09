@@ -372,7 +372,48 @@ async function apiEliminar(tabla, where) {
     for (const k in where) fd.append(`where[${k}]`, where[k]);
 
     const r = await fetch("api.php", { method: "POST", body: fd });
+    let j = await r.json();
+
+    // Si MySQL devolvio un error de llave foranea, lo traducimos
+    if (!j.ok && j.error) {
+        let err = j.error;
+
+        if (err.indexOf("foreign key constraint fails") !== -1) {
+            let match = err.match(/REFERENCES `([^`]+)`/);
+
+            if (match) {
+                let tablaBloqueo = match[1];
+                j.error = `No se puede eliminar porque este registro se esta usando en la tabla "${tablaBloqueo}".`;
+            } else {
+                j.error = "No se puede eliminar porque este registro se esta usando en otra tabla.";
+            }
+        }
+    }
+
+    return j;
+}
+
+async function apiVerificarUso(tabla, where) {
+    const fd = new FormData();
+    fd.append("tabla", tabla);
+    fd.append("accion", "verificar_uso");
+    for (const k in where) fd.append(`where[${k}]`, where[k]);
+
+    const r = await fetch("api.php", { method: "POST", body: fd });
     return await r.json();
+}
+
+function nombresBonitos(tablas) {
+    const mapa = {
+        "estado":              "Estados",
+        "municipio":           "Municipios",
+        "ciudad":              "Ciudades",
+        "tipo_asentamiento":   "Tipos de asentamiento",
+        "zona":                "Zonas",
+        "CP":                  "Codigos postales",
+        "asentamiento":        "Asentamientos"
+    };
+    return tablas.map(t => mapa[t] || t).join(", ");
 }
 
 
@@ -732,6 +773,25 @@ async function eliminarMunicipio(index) {
 async function confirmarEliminarMunicipio(index) {
     let m = municipios[index];
 
+    let check = await apiVerificarUso("municipio", {
+        c_estado: m.c_estado,
+        c_municipio: m.c_municipio
+    });
+
+    if (check.ok && check.usos.length > 0) {
+        let tablas = check.usos.map(u =>
+            `${nombresBonitos([u.tabla])} (${u.total} registro${u.total > 1 ? 's' : ''})`
+        ).join(", ");
+        abrirModal("No se puede eliminar", `
+            <p>El municipio <b>"${esc(m.nombre)}"</b> esta siendo usado en:</p>
+            <p style="color:#c0392b;"><b>${esc(tablas)}</b></p>
+            <p>Primero elimina o cambia esos registros.</p>
+        `, `
+            <button class="btn-salir" onclick="cerrarModal()">Aceptar</button>
+        `);
+        return;
+    }
+
     let r = await apiEliminar("municipio", {
         c_estado: m.c_estado,
         c_municipio: m.c_municipio
@@ -835,7 +895,6 @@ function formAgregarCiudadConDatos(c_estadoInicial, c_municipioInicial, nombreIn
         <button class="btn-salir" onclick="cerrarModal()">Cancelar</button>
     `);
 
-    // Precargar estado
     if (c_estadoInicial !== "" && c_estadoInicial !== null) {
         let e = estados.find(x => x.c_estado === c_estadoInicial);
         if (e) {
@@ -844,7 +903,6 @@ function formAgregarCiudadConDatos(c_estadoInicial, c_municipioInicial, nombreIn
         }
     }
 
-    // Precargar municipio
     if (c_municipioInicial !== "" && c_municipioInicial !== null && c_estadoInicial !== "") {
         let m = municipios.find(x =>
             x.c_estado === c_estadoInicial &&
@@ -856,12 +914,10 @@ function formAgregarCiudadConDatos(c_estadoInicial, c_municipioInicial, nombreIn
         }
     }
 
-    // Precargar nombre
     if (nombreInicial !== "") {
         document.getElementById("nuevaCiudadNombre").value = nombreInicial;
     }
 
-    // Autocomplete ESTADO
     inicializarAutocomplete({
         idInput: "nuevaCiudadEstadoInput",
         idLista: "nuevaCiudadEstadoLista",
@@ -876,7 +932,6 @@ function formAgregarCiudadConDatos(c_estadoInicial, c_municipioInicial, nombreIn
         alCrearNuevo: null
     });
 
-    // Autocomplete MUNICIPIO
     inicializarAutocomplete({
         idInput: "nuevaCiudadMunicipioInput",
         idLista: "nuevaCiudadMunicipioLista",
@@ -1022,6 +1077,26 @@ async function eliminarCiudad(index) {
 async function confirmarEliminarCiudad(index) {
     let c = ciudades[index];
 
+    let check = await apiVerificarUso("ciudad", {
+        c_estado: c.c_estado,
+        c_municipio: c.c_municipio,
+        c_cve_ciudad: c.c_cve_ciudad
+    });
+
+    if (check.ok && check.usos.length > 0) {
+        let tablas = check.usos.map(u =>
+            `${nombresBonitos([u.tabla])} (${u.total} registro${u.total > 1 ? 's' : ''})`
+        ).join(", ");
+        abrirModal("No se puede eliminar", `
+            <p>La ciudad <b>"${esc(c.d_ciudad)}"</b> esta siendo usada en:</p>
+            <p style="color:#c0392b;"><b>${esc(tablas)}</b></p>
+            <p>Primero elimina o cambia esos registros.</p>
+        `, `
+            <button class="btn-salir" onclick="cerrarModal()">Aceptar</button>
+        `);
+        return;
+    }
+
     let r = await apiEliminar("ciudad", {
         c_estado: c.c_estado,
         c_municipio: c.c_municipio,
@@ -1133,6 +1208,24 @@ async function eliminarTipo(index) {
 async function confirmarEliminarTipo(index) {
     let t = tiposAsentamiento[index];
 
+    let check = await apiVerificarUso("tipo_asentamiento", {
+        c_tipo_asentamiento: t.c_tipo_asentamiento
+    });
+
+    if (check.ok && check.usos.length > 0) {
+        let tablas = check.usos.map(u =>
+            `${nombresBonitos([u.tabla])} (${u.total} registro${u.total > 1 ? 's' : ''})`
+        ).join(", ");
+        abrirModal("No se puede eliminar", `
+            <p>El tipo de asentamiento <b>"${esc(t.d_tipo_asentamiento)}"</b> esta siendo usado en:</p>
+            <p style="color:#c0392b;"><b>${esc(tablas)}</b></p>
+            <p>Primero elimina o cambia esos registros.</p>
+        `, `
+            <button class="btn-salir" onclick="cerrarModal()">Aceptar</button>
+        `);
+        return;
+    }
+
     let r = await apiEliminar("tipo_asentamiento", {
         c_tipo_asentamiento: t.c_tipo_asentamiento
     });
@@ -1242,6 +1335,24 @@ async function eliminarZona(index) {
 async function confirmarEliminarZona(index) {
     let z = zonas[index];
 
+    let check = await apiVerificarUso("zona", {
+        c_zona: z.c_zona
+    });
+
+    if (check.ok && check.usos.length > 0) {
+        let tablas = check.usos.map(u =>
+            `${nombresBonitos([u.tabla])} (${u.total} registro${u.total > 1 ? 's' : ''})`
+        ).join(", ");
+        abrirModal("No se puede eliminar", `
+            <p>La zona <b>"${esc(z.d_zona)}"</b> esta siendo usada en:</p>
+            <p style="color:#c0392b;"><b>${esc(tablas)}</b></p>
+            <p>Primero elimina o cambia esos registros.</p>
+        `, `
+            <button class="btn-salir" onclick="cerrarModal()">Aceptar</button>
+        `);
+        return;
+    }
+
     let r = await apiEliminar("zona", { c_zona: z.c_zona });
 
     cerrarModal();
@@ -1348,6 +1459,24 @@ async function eliminarCP(index) {
 
 async function confirmarEliminarCP(index) {
     let c = codigosPostales[index];
+
+    let check = await apiVerificarUso("CP", {
+        c_CP: c.c_CP
+    });
+
+    if (check.ok && check.usos.length > 0) {
+        let tablas = check.usos.map(u =>
+            `${nombresBonitos([u.tabla])} (${u.total} registro${u.total > 1 ? 's' : ''})`
+        ).join(", ");
+        abrirModal("No se puede eliminar", `
+            <p>El codigo postal <b>"${esc(c.c_CP)}"</b> esta siendo usado en:</p>
+            <p style="color:#c0392b;"><b>${esc(tablas)}</b></p>
+            <p>Primero elimina o cambia esos registros.</p>
+        `, `
+            <button class="btn-salir" onclick="cerrarModal()">Aceptar</button>
+        `);
+        return;
+    }
 
     let r = await apiEliminar("CP", { c_CP: c.c_CP });
 
@@ -1602,7 +1731,6 @@ function formAgregarAsentamientoConDatos(datos) {
         <button class="btn-salir" onclick="cerrarModal()">Cancelar</button>
     `);
 
-    // Precargar estado
     if (datos.c_estado) {
         let e = estados.find(x => x.c_estado === datos.c_estado);
         if (e) {
@@ -1610,7 +1738,6 @@ function formAgregarAsentamientoConDatos(datos) {
             document.getElementById("nuevoAsentEstado").value = e.c_estado;
         }
     }
-    // Precargar municipio
     if (datos.c_municipio && datos.c_estado) {
         let m = municipios.find(x =>
             x.c_estado === datos.c_estado &&
@@ -1621,7 +1748,6 @@ function formAgregarAsentamientoConDatos(datos) {
             document.getElementById("nuevoAsentMunicipio").value = m.c_municipio;
         }
     }
-    // Precargar tipo
     if (datos.c_tipo_asentamiento) {
         let t = tiposAsentamiento.find(x => x.c_tipo_asentamiento === datos.c_tipo_asentamiento);
         if (t) {
@@ -1629,7 +1755,6 @@ function formAgregarAsentamientoConDatos(datos) {
             document.getElementById("nuevoAsentTipo").value = t.c_tipo_asentamiento;
         }
     }
-    // Precargar zona
     if (datos.c_zona) {
         let z = zonas.find(x => x.c_zona === datos.c_zona);
         if (z) {
@@ -1637,7 +1762,6 @@ function formAgregarAsentamientoConDatos(datos) {
             document.getElementById("nuevoAsentZona").value = z.c_zona;
         }
     }
-    // Precargar CP
     if (datos.c_CP) {
         let c = codigosPostales.find(x => x.c_CP === datos.c_CP);
         if (c) {
@@ -1646,7 +1770,6 @@ function formAgregarAsentamientoConDatos(datos) {
         }
     }
 
-    // Autocomplete ESTADO
     inicializarAutocomplete({
         idInput: "nuevoAsentEstadoInput",
         idLista: "nuevoAsentEstadoLista",
@@ -1661,7 +1784,6 @@ function formAgregarAsentamientoConDatos(datos) {
         alCrearNuevo: null
     });
 
-    // Autocomplete MUNICIPIO
     inicializarAutocomplete({
         idInput: "nuevoAsentMunicipioInput",
         idLista: "nuevoAsentMunicipioLista",
@@ -1679,7 +1801,6 @@ function formAgregarAsentamientoConDatos(datos) {
         }
     });
 
-    // Autocomplete TIPO
     inicializarAutocomplete({
         idInput: "nuevoAsentTipoInput",
         idLista: "nuevoAsentTipoLista",
@@ -1693,7 +1814,6 @@ function formAgregarAsentamientoConDatos(datos) {
         }
     });
 
-    // Autocomplete ZONA
     inicializarAutocomplete({
         idInput: "nuevoAsentZonaInput",
         idLista: "nuevoAsentZonaLista",
@@ -1707,7 +1827,6 @@ function formAgregarAsentamientoConDatos(datos) {
         }
     });
 
-    // Autocomplete CP
     inicializarAutocomplete({
         idInput: "nuevoAsentCPInput",
         idLista: "nuevoAsentCPLista",
