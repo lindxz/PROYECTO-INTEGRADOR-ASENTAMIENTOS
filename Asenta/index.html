@@ -1,0 +1,2097 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>REPUBLICA MEXICANA</title>
+    <style>
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #eaf0f8;
+            color: #333;
+        }
+
+        header {
+            background: #173b63;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        header h1 { margin: 5px; }
+        header p { margin: 5px; }
+
+        .pantalla { display: none; }
+        .activa { display: block; }
+
+        .contenedor {
+            background: white;
+            width: 400px;
+            max-width: 90%;
+            margin: 60px auto;
+            padding: 35px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px #0003;
+            text-align: center;
+        }
+
+        button {
+            background: #173b63;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 15px;
+            margin: 5px;
+        }
+
+        button:hover { background: #285b8e; }
+
+        .boton-grande {
+            width: 80%;
+            padding: 15px;
+            font-size: 17px;
+        }
+
+        input, select {
+            width: 90%;
+            padding: 11px;
+            margin: 8px;
+            border: 1px solid #bbb;
+            border-radius: 6px;
+        }
+
+        .mensaje {
+            color: #c0392b;
+            font-weight: bold;
+        }
+
+        #panelAdmin, #panelContribuyente { min-height: 100vh; }
+
+        nav {
+            background: #285b8e;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            padding: 10px;
+        }
+
+        nav button { background: transparent; margin: 3px; }
+        nav button:hover { background: #173b63; }
+
+        .contenido {
+            background: white;
+            width: 90%;
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px #0003;
+            text-align: center;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th {
+            background: #173b63;
+            color: white;
+            padding: 12px;
+        }
+
+        td {
+            border: 1px solid #ccc;
+            padding: 10px;
+            font-size: 14px;
+        }
+
+        tr:nth-child(even) { background: #f2f6fa; }
+
+        .buscador {
+            width: 60%;
+            max-width: 500px;
+        }
+
+        .btn-editar { background: #2980b9; }
+        .btn-eliminar { background: #c0392b; }
+        .btn-agregar { background: #27ae60; }
+        .btn-salir { background: #7f8c8d; }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: #0008;
+            overflow-y: auto;
+        }
+
+        .modal-contenido {
+            background: white;
+            width: 450px;
+            max-width: 90%;
+            margin: 60px auto;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+        }
+
+        .modal-contenido h2 { margin-top: 0; }
+
+        /* ============================================
+           AUTOCOMPLETADO
+        ============================================ */
+        .autocomplete-wrap {
+            position: relative;
+            width: 90%;
+            margin: 8px auto;
+        }
+
+        .autocomplete-wrap input {
+            width: 100%;
+            margin: 0;
+        }
+
+        .autocomplete-lista {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #bbb;
+            border-top: none;
+            max-height: 180px;
+            overflow-y: auto;
+            z-index: 2000;
+            text-align: left;
+            box-shadow: 0 4px 8px #0002;
+        }
+
+        .autocomplete-lista div {
+            padding: 8px 10px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .autocomplete-lista div:hover { background: #eaf0f8; }
+
+        .autocomplete-lista .sin-resultados {
+            color: #888;
+            cursor: default;
+        }
+
+        .autocomplete-lista .btn-crear {
+            background: #e8f8ee;
+            color: #27ae60;
+            font-weight: bold;
+            border-top: 1px solid #ccc;
+        }
+
+        @media(max-width:700px) {
+            table { font-size: 12px; }
+            .contenido { width: 95%; padding: 15px; overflow-x: auto; }
+            nav button { font-size: 12px; padding: 8px; }
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- PANTALLA PRINCIPAL -->
+<div id="inicio" class="pantalla activa">
+    <header>
+        <h1>REPUBLICA MEXICANA</h1>
+        <p>Sistema de consulta de informacion</p>
+    </header>
+
+    <div class="contenedor">
+        <h2>Bienvenido</h2>
+        <p>Selecciona el tipo de usuario para continuar.</p>
+        <button class="boton-grande" onclick="mostrarLogin()">ADMINISTRADOR</button>
+        <br>
+        <button class="boton-grande" onclick="entrarContribuyente()">CONTRIBUYENTE</button>
+    </div>
+</div>
+
+<!-- LOGIN -->
+<div id="login" class="pantalla">
+    <header>
+        <h1>REPUBLICA MEXICANA</h1>
+        <p>Inicio de sesion del administrador</p>
+    </header>
+
+    <div class="contenedor">
+        <h2>Inicio de sesion</h2>
+        <form onsubmit="iniciarSesion(event)">
+            <input type="text" id="usuario" placeholder="Usuario" required>
+            <input type="password" id="contrasena" placeholder="Contrasena" required>
+            <br>
+            <button type="submit">Iniciar sesion</button>
+        </form>
+        <button class="btn-salir" onclick="regresarInicio()">Regresar</button>
+        <p id="mensajeLogin" class="mensaje"></p>
+    </div>
+</div>
+
+<!-- PANEL ADMIN -->
+<div id="panelAdmin" class="pantalla">
+    <header>
+        <h1>REPUBLICA MEXICANA</h1>
+        <p>Panel del Administrador</p>
+    </header>
+
+    <nav>
+        <button onclick="abrirInicioAdmin()">Inicio</button>
+        <button onclick="abrirEstado()">Estado</button>
+        <button onclick="abrirMunicipio()">Municipio</button>
+        <button onclick="abrirCiudad()">Ciudad</button>
+        <button onclick="abrirTipoAsentamiento()">Tipo de asentamiento</button>
+        <button onclick="abrirAsentamientoAdmin()">Asentamiento</button>
+        <button onclick="abrirZona()">Zona</button>
+        <button onclick="abrirCodigoPostal()">Codigo postal</button>
+        <button onclick="abrirAuditorias()">Auditorias</button>
+        <button onclick="cerrarSesion()">Cerrar sesion</button>
+    </nav>
+
+    <div id="contenidoAdmin" class="contenido"></div>
+</div>
+
+<!-- PANEL CONTRIBUYENTE -->
+<div id="panelContribuyente" class="pantalla">
+    <header>
+        <h1>REPUBLICA MEXICANA</h1>
+        <p>Consulta para contribuyentes</p>
+    </header>
+
+    <nav>
+        <button onclick="abrirAsentamientoContribuyente()">Asentamientos</button>
+        <button onclick="cerrarContribuyente()">Salir</button>
+    </nav>
+
+    <div id="contenidoContribuyente" class="contenido"></div>
+</div>
+
+<!-- MODAL -->
+<div id="modal" class="modal">
+    <div class="modal-contenido">
+        <h2 id="modalTitulo">Aviso</h2>
+        <div id="modalCuerpo"></div>
+        <div id="modalBotones" style="margin-top:15px;"></div>
+    </div>
+</div>
+
+
+<script>
+
+/* =====================================================
+   VARIABLES GLOBALES
+===================================================== */
+
+let estados = [];
+let municipios = [];
+let ciudades = [];
+let tiposAsentamiento = [];
+let asentamientos = [];
+let zonas = [];
+let codigosPostales = [];
+let auditorias = [];
+
+let usuarioActual = "admin";
+
+
+/* =====================================================
+   UTILIDADES
+===================================================== */
+
+function normalizar(t) {
+    if (t === null || t === undefined) return "";
+    return t.toString()
+        .trim()
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "");
+}
+
+function esc(texto) {
+    if (texto === null || texto === undefined) return "";
+    return String(texto)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+}
+
+
+/* =====================================================
+   API
+===================================================== */
+
+async function apiListar(tabla) {
+    const r = await fetch(`api.php?tabla=${tabla}&accion=listar`);
+    const j = await r.json();
+    return j.ok ? j.datos : [];
+}
+
+async function apiInsertar(tabla, campos) {
+    const fd = new FormData();
+    fd.append("tabla", tabla);
+    fd.append("accion", "insertar");
+    for (const k in campos) fd.append(`campos[${k}]`, campos[k]);
+
+    const r = await fetch("api.php", { method: "POST", body: fd });
+    return await r.json();
+}
+
+async function apiActualizar(tabla, campos, where) {
+    const fd = new FormData();
+    fd.append("tabla", tabla);
+    fd.append("accion", "actualizar");
+    for (const k in campos) fd.append(`campos[${k}]`, campos[k]);
+    for (const k in where) fd.append(`where[${k}]`, where[k]);
+
+    const r = await fetch("api.php", { method: "POST", body: fd });
+    return await r.json();
+}
+
+async function apiEliminar(tabla, where) {
+    const fd = new FormData();
+    fd.append("tabla", tabla);
+    fd.append("accion", "eliminar");
+    for (const k in where) fd.append(`where[${k}]`, where[k]);
+
+    const r = await fetch("api.php", { method: "POST", body: fd });
+    return await r.json();
+}
+
+
+/* =====================================================
+   MODAL GENERICO
+===================================================== */
+
+function abrirModal(titulo, cuerpoHTML, botonesHTML) {
+    document.getElementById("modalTitulo").textContent = titulo;
+    document.getElementById("modalCuerpo").innerHTML = cuerpoHTML;
+    document.getElementById("modalBotones").innerHTML = botonesHTML;
+    document.getElementById("modal").style.display = "block";
+}
+
+function cerrarModal() {
+    document.getElementById("modal").style.display = "none";
+}
+
+function mostrarAviso(titulo, mensaje) {
+    abrirModal(
+        titulo,
+        `<p>${esc(mensaje)}</p>`,
+        `<button onclick="cerrarModal()">Aceptar</button>`
+    );
+}
+
+
+/* =====================================================
+   CAMBIO DE PANTALLAS
+===================================================== */
+
+function ocultarTodo() {
+    document.querySelectorAll(".pantalla").forEach(p => p.classList.remove("activa"));
+}
+
+function mostrarLogin() {
+    ocultarTodo();
+    document.getElementById("login").classList.add("activa");
+}
+
+function regresarInicio() {
+    ocultarTodo();
+    document.getElementById("inicio").classList.add("activa");
+}
+
+function cerrarSesion() {
+    document.getElementById("usuario").value = "";
+    document.getElementById("contrasena").value = "";
+    regresarInicio();
+}
+
+function iniciarSesion(event) {
+    event.preventDefault();
+    let usuario = document.getElementById("usuario").value;
+    let password = document.getElementById("contrasena").value;
+
+    if (usuario === "admin" && password === "1234") {
+        usuarioActual = usuario;
+        ocultarTodo();
+        document.getElementById("panelAdmin").classList.add("activa");
+        abrirInicioAdmin();
+    } else {
+        document.getElementById("mensajeLogin").textContent = "Usuario o contrasena incorrectos.";
+    }
+}
+
+
+/* =====================================================
+   CONTRIBUYENTE
+===================================================== */
+
+function entrarContribuyente() {
+    ocultarTodo();
+    document.getElementById("panelContribuyente").classList.add("activa");
+    abrirAsentamientoContribuyente();
+}
+
+function cerrarContribuyente() {
+    regresarInicio();
+}
+
+
+/* =====================================================
+   INICIO ADMIN
+===================================================== */
+
+function abrirInicioAdmin() {
+    document.getElementById("contenidoAdmin").innerHTML = `
+        <h2>Bienvenido Administrador</h2>
+        <p>Selecciona una opcion del menu para administrar la informacion.</p>
+    `;
+}
+
+
+/* =====================================================
+   AUTOCOMPLETADO GENERICO
+===================================================== */
+
+function inicializarAutocomplete(config) {
+
+    let input = document.getElementById(config.idInput);
+    let lista = document.getElementById(config.idLista);
+    let hidden = document.getElementById(config.idHidden);
+
+    function mostrarSugerencias() {
+
+        let texto = normalizar(input.value);
+
+        if (texto === "") {
+            lista.style.display = "none";
+            return;
+        }
+
+        let datos = config.obtenerDatos() || [];
+
+        let coincidencias = datos.filter(d => {
+            let nombre = normalizar(d.nombre || d.d_ciudad || d.d_tipo_asentamiento || d.d_zona || d.d_CP || "");
+            let id = normalizar(d[config.campoId]);
+            return nombre.includes(texto) || id.includes(texto);
+        }).slice(0, 20);
+
+        lista.innerHTML = "";
+
+        coincidencias.forEach(d => {
+            let textoMostrar = config.formatearTexto(d);
+            let div = document.createElement("div");
+            div.textContent = textoMostrar;
+            div.addEventListener("click", function () {
+                input.value = textoMostrar;
+                hidden.value = d[config.campoId];
+                lista.style.display = "none";
+                if (config.alSeleccionar) config.alSeleccionar(d);
+            });
+            lista.appendChild(div);
+        });
+
+        let existeExacta = datos.some(d => {
+            let nombre = normalizar(d.nombre || d.d_ciudad || d.d_tipo_asentamiento || d.d_zona || d.d_CP || "");
+            return nombre === texto;
+        });
+
+        if (!existeExacta && config.alCrearNuevo && input.value.trim() !== "") {
+            let divCrear = document.createElement("div");
+            divCrear.className = "btn-crear";
+            divCrear.textContent = `+ Agregar nuevo: "${input.value.trim()}"`;
+            divCrear.addEventListener("click", function () {
+                config.alCrearNuevo(input.value.trim());
+            });
+            lista.appendChild(divCrear);
+        }
+
+        if (lista.children.length === 0) {
+            let div = document.createElement("div");
+            div.className = "sin-resultados";
+            div.textContent = "Sin resultados";
+            lista.appendChild(div);
+        }
+
+        lista.style.display = "block";
+    }
+
+    input.addEventListener("input", mostrarSugerencias);
+    input.addEventListener("focus", mostrarSugerencias);
+
+    document.addEventListener("click", function (e) {
+        if (!input.contains(e.target) && !lista.contains(e.target)) {
+            lista.style.display = "none";
+        }
+    });
+}
+
+
+/* =====================================================
+   ESTADOS (solo editar)
+===================================================== */
+
+async function abrirEstado() {
+    estados = await apiListar("estado");
+
+    let html = `
+        <h2>Estados</h2>
+        <p>Consulta y actualizacion de estados.</p>
+        <table>
+            <thead>
+                <tr>
+                    <th>Clave</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+    `;
+
+    estados.forEach((e, index) => {
+        html += `
+            <tr>
+                <td>${esc(e.c_estado)}</td>
+                <td>${esc(e.nombre)}</td>
+                <td>
+                    <button class="btn-editar" onclick="editarEstado(${index})">Editar</button>
+                </td>
+            </tr>
+        `;
+    });
+
+    html += `</tbody></table>`;
+    document.getElementById("contenidoAdmin").innerHTML = html;
+}
+
+function editarEstado(index) {
+    let e = estados[index];
+
+    abrirModal("Editar estado", `
+        <p><b>Clave:</b> ${esc(e.c_estado)}</p>
+        <input type="text" id="editEstadoNombre" value="${esc(e.nombre)}">
+    `, `
+        <button class="btn-agregar" onclick="guardarEstado(${index})">Guardar</button>
+        <button class="btn-salir" onclick="cerrarModal()">Cancelar</button>
+    `);
+}
+
+async function guardarEstado(index) {
+    let nombre = document.getElementById("editEstadoNombre").value.trim();
+    if (nombre === "") return;
+
+    let r = await apiActualizar(
+        "estado",
+        { nombre: nombre },
+        { c_estado: estados[index].c_estado }
+    );
+
+    cerrarModal();
+    if (!r.ok) mostrarAviso("Error", r.error);
+    abrirEstado();
+}
+
+
+/* =====================================================
+   MUNICIPIOS
+===================================================== */
+
+async function abrirMunicipio() {
+    municipios = await apiListar("municipio");
+    estados = await apiListar("estado");
+
+    let html = `
+        <h2>Municipios</h2>
+        <button class="btn-agregar" onclick="formAgregarMunicipio()">+ Agregar municipio</button>
+        <table>
+            <thead>
+                <tr>
+                    <th>Estado</th>
+                    <th>Municipio</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+    `;
+
+    municipios.forEach((m, index) => {
+        let e = estados.find(x => x.c_estado === m.c_estado);
+        let nombreEstado = e ? e.nombre : m.c_estado;
+
+        html += `
+            <tr>
+                <td>${esc(nombreEstado)}</td>
+                <td>${esc(m.nombre)}</td>
+                <td>
+                    <button class="btn-editar" onclick="formEditarMunicipio(${index})">Editar</button>
+                    <button class="btn-eliminar" onclick="eliminarMunicipio(${index})">Eliminar</button>
+                </td>
+            </tr>
+        `;
+    });
+
+    html += `</tbody></table>`;
+    document.getElementById("contenidoAdmin").innerHTML = html;
+}
+
+function opcionesEstados(seleccionado) {
+    let html = `<option value="">-- Selecciona --</option>`;
+    estados.forEach(e => {
+        let sel = (e.c_estado === seleccionado) ? "selected" : "";
+        html += `<option value="${esc(e.c_estado)}" ${sel}>${esc(e.c_estado)} - ${esc(e.nombre)}</option>`;
+    });
+    return html;
+}
+
+function formAgregarMunicipio() {
+    abrirModal("Agregar municipio", `
+        <select id="nuevoMunicipioEstado">${opcionesEstados("")}</select>
+        <input type="text" id="nuevoMunicipioNombre" placeholder="Nombre del municipio">
+    `, `
+        <button class="btn-agregar" onclick="guardarMunicipio()">Guardar</button>
+        <button class="btn-salir" onclick="cerrarModal()">Cancelar</button>
+    `);
+}
+
+async function guardarMunicipio() {
+    let c_estado = document.getElementById("nuevoMunicipioEstado").value;
+    let nombre = document.getElementById("nuevoMunicipioNombre").value.trim();
+
+    if (c_estado === "" || nombre === "") return;
+
+    let r = await apiInsertar("municipio", {
+        c_estado: c_estado,
+        nombre: nombre
+    });
+
+    cerrarModal();
+    if (!r.ok) mostrarAviso("Error", r.error);
+    abrirMunicipio();
+}
+
+function formEditarMunicipio(index) {
+    let m = municipios[index];
+
+    abrirModal("Editar municipio", `
+        <p><b>Estado:</b> ${esc(m.c_estado)}</p>
+        <p><b>Clave:</b> ${esc(m.c_municipio)}</p>
+        <input type="text" id="editMunicipioNombre" value="${esc(m.nombre)}">
+    `, `
+        <button class="btn-agregar" onclick="guardarEdicionMunicipio(${index})">Guardar</button>
+        <button class="btn-salir" onclick="cerrarModal()">Cancelar</button>
+    `);
+}
+
+async function guardarEdicionMunicipio(index) {
+    let nombre = document.getElementById("editMunicipioNombre").value.trim();
+    if (nombre === "") return;
+
+    let r = await apiActualizar(
+        "municipio",
+        { nombre: nombre },
+        {
+            c_estado: municipios[index].c_estado,
+            c_municipio: municipios[index].c_municipio
+        }
+    );
+
+    cerrarModal();
+    if (!r.ok) mostrarAviso("Error", r.error);
+    abrirMunicipio();
+}
+
+async function eliminarMunicipio(index) {
+    let m = municipios[index];
+
+    abrirModal("Confirmar", `
+        <p>Eliminar municipio <b>"${esc(m.nombre)}"</b>?</p>
+    `, `
+        <button class="btn-eliminar" onclick="confirmarEliminarMunicipio(${index})">Eliminar</button>
+        <button class="btn-salir" onclick="cerrarModal()">Cancelar</button>
+    `);
+}
+
+async function confirmarEliminarMunicipio(index) {
+    let m = municipios[index];
+
+    let r = await apiEliminar("municipio", {
+        c_estado: m.c_estado,
+        c_municipio: m.c_municipio
+    });
+
+    cerrarModal();
+    if (!r.ok) mostrarAviso("Error", r.error);
+    abrirMunicipio();
+}
+
+
+/* =====================================================
+   CIUDADES
+===================================================== */
+
+async function abrirCiudad() {
+    ciudades = await apiListar("ciudad");
+    estados = await apiListar("estado");
+    municipios = await apiListar("municipio");
+
+    let html = `
+        <h2>Ciudades</h2>
+        <button class="btn-agregar" onclick="formAgregarCiudad()">+ Agregar ciudad</button>
+        <table>
+            <thead>
+                <tr>
+                    <th>Estado</th>
+                    <th>Municipio</th>
+                    <th>Ciudad</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+    `;
+
+    ciudades.forEach((c, index) => {
+        let e = estados.find(x => x.c_estado === c.c_estado);
+        let nombreEstado = e ? e.nombre : c.c_estado;
+
+        let m = municipios.find(x =>
+            x.c_estado === c.c_estado && x.c_municipio === c.c_municipio
+        );
+        let nombreMunicipio = m ? m.nombre : c.c_municipio;
+
+        html += `
+            <tr>
+                <td>${esc(nombreEstado)}</td>
+                <td>${esc(nombreMunicipio)}</td>
+                <td>${esc(c.d_ciudad)}</td>
+                <td>
+                    <button class="btn-editar" onclick="formEditarCiudad(${index})">Editar</button>
+                    <button class="btn-eliminar" onclick="eliminarCiudad(${index})">Eliminar</button>
+                </td>
+            </tr>
+        `;
+    });
+
+    html += `</tbody></table>`;
+    document.getElementById("contenidoAdmin").innerHTML = html;
+}
+
+function municipiosDeEstado(c_estado) {
+    return municipios.filter(m => m.c_estado === c_estado);
+}
+
+function opcionesMunicipios(c_estado, seleccionado) {
+    let html = `<option value="">-- Selecciona --</option>`;
+    municipiosDeEstado(c_estado).forEach(m => {
+        let sel = (m.c_municipio === seleccionado) ? "selected" : "";
+        html += `<option value="${esc(m.c_municipio)}" ${sel}>${esc(m.c_municipio)} - ${esc(m.nombre)}</option>`;
+    });
+    return html;
+}
+
+function formAgregarCiudad() {
+    formAgregarCiudadConDatos("", "", "");
+}
+
+function formAgregarCiudadConDatos(c_estadoInicial, c_municipioInicial, nombreInicial) {
+
+    abrirModal("Agregar ciudad", `
+        <div class="autocomplete-wrap">
+            <input type="text" id="nuevaCiudadEstadoInput"
+                   placeholder="Escribe el estado..."
+                   autocomplete="off">
+            <input type="hidden" id="nuevaCiudadEstado">
+            <div class="autocomplete-lista" id="nuevaCiudadEstadoLista" style="display:none;"></div>
+        </div>
+
+        <div class="autocomplete-wrap">
+            <input type="text" id="nuevaCiudadMunicipioInput"
+                   placeholder="Escribe el municipio..."
+                   autocomplete="off">
+            <input type="hidden" id="nuevaCiudadMunicipio">
+            <div class="autocomplete-lista" id="nuevaCiudadMunicipioLista" style="display:none;"></div>
+        </div>
+
+        <input type="text" id="nuevaCiudadNombre" placeholder="Nombre de la ciudad">
+    `, `
+        <button class="btn-agregar" onclick="guardarCiudad()">Guardar</button>
+        <button class="btn-salir" onclick="cerrarModal()">Cancelar</button>
+    `);
+
+    // Precargar estado
+    if (c_estadoInicial !== "" && c_estadoInicial !== null) {
+        let e = estados.find(x => x.c_estado === c_estadoInicial);
+        if (e) {
+            document.getElementById("nuevaCiudadEstadoInput").value = `${e.c_estado} - ${e.nombre}`;
+            document.getElementById("nuevaCiudadEstado").value = e.c_estado;
+        }
+    }
+
+    // Precargar municipio
+    if (c_municipioInicial !== "" && c_municipioInicial !== null && c_estadoInicial !== "") {
+        let m = municipios.find(x =>
+            x.c_estado === c_estadoInicial &&
+            x.c_municipio === c_municipioInicial
+        );
+        if (m) {
+            document.getElementById("nuevaCiudadMunicipioInput").value = `${m.c_municipio} - ${m.nombre}`;
+            document.getElementById("nuevaCiudadMunicipio").value = m.c_municipio;
+        }
+    }
+
+    // Precargar nombre
+    if (nombreInicial !== "") {
+        document.getElementById("nuevaCiudadNombre").value = nombreInicial;
+    }
+
+    // Autocomplete ESTADO
+    inicializarAutocomplete({
+        idInput: "nuevaCiudadEstadoInput",
+        idLista: "nuevaCiudadEstadoLista",
+        idHidden: "nuevaCiudadEstado",
+        obtenerDatos: () => estados,
+        campoId: "c_estado",
+        formatearTexto: (e) => `${e.c_estado} - ${e.nombre}`,
+        alSeleccionar: () => {
+            document.getElementById("nuevaCiudadMunicipioInput").value = "";
+            document.getElementById("nuevaCiudadMunicipio").value = "";
+        },
+        alCrearNuevo: null
+    });
+
+    // Autocomplete MUNICIPIO
+    inicializarAutocomplete({
+        idInput: "nuevaCiudadMunicipioInput",
+        idLista: "nuevaCiudadMunicipioLista",
+        idHidden: "nuevaCiudadMunicipio",
+        obtenerDatos: () => {
+            let c_estado = document.getElementById("nuevaCiudadEstado").value;
+            if (c_estado === "") return [];
+            return municipios.filter(m => m.c_estado === c_estado);
+        },
+        campoId: "c_municipio",
+        formatearTexto: (m) => `${m.c_municipio} - ${m.nombre}`,
+        alSeleccionar: null,
+        alCrearNuevo: function (nombre) {
+            crearMunicipioDesdeCiudad(nombre);
+        }
+    });
+}
+
+async function guardarCiudad() {
+    let c_estado = document.getElementById("nuevaCiudadEstado").value;
+    let c_municipio = document.getElementById("nuevaCiudadMunicipio").value;
+    let nombre = document.getElementById("nuevaCiudadNombre").value.trim();
+
+    if (c_estado === "" || c_municipio === "" || nombre === "") {
+        mostrarAviso("Aviso", "Selecciona estado, municipio y escribe el nombre de la ciudad");
+        return;
+    }
+
+    let r = await apiInsertar("ciudad", {
+        c_estado: c_estado,
+        c_municipio: c_municipio,
+        d_ciudad: nombre
+    });
+
+    cerrarModal();
+    if (!r.ok) mostrarAviso("Error", r.error);
+    abrirCiudad();
+}
+
+function crearMunicipioDesdeCiudad(nombre) {
+
+    let c_estado = document.getElementById("nuevaCiudadEstado").value;
+
+    if (c_estado === "") {
+        mostrarAviso("Aviso", "Primero selecciona el estado");
+        return;
+    }
+
+    window.tempCiudad = {
+        c_estado: c_estado,
+        nombre:   document.getElementById("nuevaCiudadNombre").value
+    };
+
+    abrirModal("Confirmar", `
+        <p>Crear el municipio <b>"${esc(nombre)}"</b> en ese estado?</p>
+    `, `
+        <button class="btn-agregar" onclick='confirmarCrearMunicipio(${JSON.stringify(nombre)})'>Aceptar</button>
+        <button class="btn-salir" onclick="cancelarCrearMunicipio()">Cancelar</button>
+    `);
+}
+
+function cancelarCrearMunicipio() {
+    let t = window.tempCiudad || {};
+    formAgregarCiudadConDatos(t.c_estado || "", "", t.nombre || "");
+}
+
+async function confirmarCrearMunicipio(nombre) {
+
+    let c_estado = window.tempCiudad ? window.tempCiudad.c_estado : "";
+
+    if (c_estado === "") {
+        mostrarAviso("Error", "No se pudo determinar el estado.");
+        return;
+    }
+
+    let r = await apiInsertar("municipio", {
+        c_estado: c_estado,
+        nombre:   nombre
+    });
+
+    if (!r.ok) {
+        mostrarAviso("Error", r.error);
+        return;
+    }
+
+    municipios = await apiListar("municipio");
+
+    let creado = municipios
+        .filter(m => m.c_estado === c_estado && m.nombre === nombre)
+        .pop();
+
+    formAgregarCiudadConDatos(
+        c_estado,
+        creado ? creado.c_municipio : "",
+        (window.tempCiudad && window.tempCiudad.nombre) ? window.tempCiudad.nombre : ""
+    );
+}
+
+function formEditarCiudad(index) {
+    let c = ciudades[index];
+
+    abrirModal("Editar ciudad", `
+        <p><b>Estado:</b> ${esc(c.c_estado)}</p>
+        <p><b>Municipio:</b> ${esc(c.c_municipio)}</p>
+        <p><b>Clave:</b> ${esc(c.c_cve_ciudad)}</p>
+        <input type="text" id="editCiudadNombre" value="${esc(c.d_ciudad)}">
+    `, `
+        <button class="btn-agregar" onclick="guardarEdicionCiudad(${index})">Guardar</button>
+        <button class="btn-salir" onclick="cerrarModal()">Cancelar</button>
+    `);
+}
+
+async function guardarEdicionCiudad(index) {
+    let nombre = document.getElementById("editCiudadNombre").value.trim();
+    if (nombre === "") return;
+
+    let r = await apiActualizar(
+        "ciudad",
+        { d_ciudad: nombre },
+        {
+            c_estado: ciudades[index].c_estado,
+            c_municipio: ciudades[index].c_municipio,
+            c_cve_ciudad: ciudades[index].c_cve_ciudad
+        }
+    );
+
+    cerrarModal();
+    if (!r.ok) mostrarAviso("Error", r.error);
+    abrirCiudad();
+}
+
+async function eliminarCiudad(index) {
+    let c = ciudades[index];
+
+    abrirModal("Confirmar", `
+        <p>Eliminar ciudad <b>"${esc(c.d_ciudad)}"</b>?</p>
+    `, `
+        <button class="btn-eliminar" onclick="confirmarEliminarCiudad(${index})">Eliminar</button>
+        <button class="btn-salir" onclick="cerrarModal()">Cancelar</button>
+    `);
+}
+
+async function confirmarEliminarCiudad(index) {
+    let c = ciudades[index];
+
+    let r = await apiEliminar("ciudad", {
+        c_estado: c.c_estado,
+        c_municipio: c.c_municipio,
+        c_cve_ciudad: c.c_cve_ciudad
+    });
+
+    cerrarModal();
+    if (!r.ok) mostrarAviso("Error", r.error);
+    abrirCiudad();
+}
+
+
+/* =====================================================
+   TIPO DE ASENTAMIENTO
+===================================================== */
+
+async function abrirTipoAsentamiento() {
+    tiposAsentamiento = await apiListar("tipo_asentamiento");
+
+    let html = `
+        <h2>Tipos de asentamiento</h2>
+        <button class="btn-agregar" onclick="formAgregarTipo()">+ Agregar tipo</button>
+        <table>
+            <thead>
+                <tr>
+                    <th>Clave</th>
+                    <th>Tipo</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+    `;
+
+    tiposAsentamiento.forEach((t, index) => {
+        html += `
+            <tr>
+                <td>${esc(t.c_tipo_asentamiento)}</td>
+                <td>${esc(t.d_tipo_asentamiento)}</td>
+                <td>
+                    <button class="btn-editar" onclick="formEditarTipo(${index})">Editar</button>
+                    <button class="btn-eliminar" onclick="eliminarTipo(${index})">Eliminar</button>
+                </td>
+            </tr>
+        `;
+    });
+
+    html += `</tbody></table>`;
+    document.getElementById("contenidoAdmin").innerHTML = html;
+}
+
+function formAgregarTipo() {
+    abrirModal("Agregar tipo de asentamiento", `
+        <input type="text" id="nuevoTipoNombre" placeholder="Nombre del tipo">
+    `, `
+        <button class="btn-agregar" onclick="guardarTipo()">Guardar</button>
+        <button class="btn-salir" onclick="cerrarModal()">Cancelar</button>
+    `);
+}
+
+async function guardarTipo() {
+    let nombre = document.getElementById("nuevoTipoNombre").value.trim();
+    if (nombre === "") return;
+
+    let r = await apiInsertar("tipo_asentamiento", { d_tipo_asentamiento: nombre });
+
+    cerrarModal();
+    if (!r.ok) mostrarAviso("Error", r.error);
+    abrirTipoAsentamiento();
+}
+
+function formEditarTipo(index) {
+    let t = tiposAsentamiento[index];
+
+    abrirModal("Editar tipo", `
+        <p><b>Clave:</b> ${esc(t.c_tipo_asentamiento)}</p>
+        <input type="text" id="editTipoNombre" value="${esc(t.d_tipo_asentamiento)}">
+    `, `
+        <button class="btn-agregar" onclick="guardarEdicionTipo(${index})">Guardar</button>
+        <button class="btn-salir" onclick="cerrarModal()">Cancelar</button>
+    `);
+}
+
+async function guardarEdicionTipo(index) {
+    let nombre = document.getElementById("editTipoNombre").value.trim();
+    if (nombre === "") return;
+
+    let r = await apiActualizar(
+        "tipo_asentamiento",
+        { d_tipo_asentamiento: nombre },
+        { c_tipo_asentamiento: tiposAsentamiento[index].c_tipo_asentamiento }
+    );
+
+    cerrarModal();
+    if (!r.ok) mostrarAviso("Error", r.error);
+    abrirTipoAsentamiento();
+}
+
+async function eliminarTipo(index) {
+    let t = tiposAsentamiento[index];
+
+    abrirModal("Confirmar", `
+        <p>Eliminar tipo <b>"${esc(t.d_tipo_asentamiento)}"</b>?</p>
+    `, `
+        <button class="btn-eliminar" onclick="confirmarEliminarTipo(${index})">Eliminar</button>
+        <button class="btn-salir" onclick="cerrarModal()">Cancelar</button>
+    `);
+}
+
+async function confirmarEliminarTipo(index) {
+    let t = tiposAsentamiento[index];
+
+    let r = await apiEliminar("tipo_asentamiento", {
+        c_tipo_asentamiento: t.c_tipo_asentamiento
+    });
+
+    cerrarModal();
+    if (!r.ok) mostrarAviso("Error", r.error);
+    abrirTipoAsentamiento();
+}
+
+
+/* =====================================================
+   ZONA
+===================================================== */
+
+async function abrirZona() {
+    zonas = await apiListar("zona");
+
+    let html = `
+        <h2>Zonas</h2>
+        <button class="btn-agregar" onclick="formAgregarZona()">+ Agregar zona</button>
+        <table>
+            <thead>
+                <tr>
+                    <th>Clave</th>
+                    <th>Zona</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+    `;
+
+    zonas.forEach((z, index) => {
+        html += `
+            <tr>
+                <td>${esc(z.c_zona)}</td>
+                <td>${esc(z.d_zona)}</td>
+                <td>
+                    <button class="btn-editar" onclick="formEditarZona(${index})">Editar</button>
+                    <button class="btn-eliminar" onclick="eliminarZona(${index})">Eliminar</button>
+                </td>
+            </tr>
+        `;
+    });
+
+    html += `</tbody></table>`;
+    document.getElementById("contenidoAdmin").innerHTML = html;
+}
+
+function formAgregarZona() {
+    abrirModal("Agregar zona", `
+        <input type="text" id="nuevaZonaNombre" placeholder="Nombre de la zona">
+    `, `
+        <button class="btn-agregar" onclick="guardarZona()">Guardar</button>
+        <button class="btn-salir" onclick="cerrarModal()">Cancelar</button>
+    `);
+}
+
+async function guardarZona() {
+    let nombre = document.getElementById("nuevaZonaNombre").value.trim();
+    if (nombre === "") return;
+
+    let r = await apiInsertar("zona", { d_zona: nombre });
+
+    cerrarModal();
+    if (!r.ok) mostrarAviso("Error", r.error);
+    abrirZona();
+}
+
+function formEditarZona(index) {
+    let z = zonas[index];
+
+    abrirModal("Editar zona", `
+        <p><b>Clave:</b> ${esc(z.c_zona)}</p>
+        <input type="text" id="editZonaNombre" value="${esc(z.d_zona)}">
+    `, `
+        <button class="btn-agregar" onclick="guardarEdicionZona(${index})">Guardar</button>
+        <button class="btn-salir" onclick="cerrarModal()">Cancelar</button>
+    `);
+}
+
+async function guardarEdicionZona(index) {
+    let nombre = document.getElementById("editZonaNombre").value.trim();
+    if (nombre === "") return;
+
+    let r = await apiActualizar(
+        "zona",
+        { d_zona: nombre },
+        { c_zona: zonas[index].c_zona }
+    );
+
+    cerrarModal();
+    if (!r.ok) mostrarAviso("Error", r.error);
+    abrirZona();
+}
+
+async function eliminarZona(index) {
+    let z = zonas[index];
+
+    abrirModal("Confirmar", `
+        <p>Eliminar zona <b>"${esc(z.d_zona)}"</b>?</p>
+    `, `
+        <button class="btn-eliminar" onclick="confirmarEliminarZona(${index})">Eliminar</button>
+        <button class="btn-salir" onclick="cerrarModal()">Cancelar</button>
+    `);
+}
+
+async function confirmarEliminarZona(index) {
+    let z = zonas[index];
+
+    let r = await apiEliminar("zona", { c_zona: z.c_zona });
+
+    cerrarModal();
+    if (!r.ok) mostrarAviso("Error", r.error);
+    abrirZona();
+}
+
+
+/* =====================================================
+   CP
+===================================================== */
+
+async function abrirCodigoPostal() {
+    codigosPostales = await apiListar("CP");
+
+    let html = `
+        <h2>Codigos postales</h2>
+        <button class="btn-agregar" onclick="formAgregarCP()">+ Agregar codigo postal</button>
+        <table>
+            <thead>
+                <tr>
+                    <th>Clave</th>
+                    <th>Descripcion</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+    `;
+
+    codigosPostales.forEach((c, index) => {
+        html += `
+            <tr>
+                <td>${esc(c.c_CP)}</td>
+                <td>${esc(c.d_CP)}</td>
+                <td>
+                    <button class="btn-editar" onclick="formEditarCP(${index})">Editar</button>
+                    <button class="btn-eliminar" onclick="eliminarCP(${index})">Eliminar</button>
+                </td>
+            </tr>
+        `;
+    });
+
+    html += `</tbody></table>`;
+    document.getElementById("contenidoAdmin").innerHTML = html;
+}
+
+function formAgregarCP() {
+    abrirModal("Agregar codigo postal", `
+        <input type="text" id="nuevoCPDesc" placeholder="Descripcion del codigo postal">
+    `, `
+        <button class="btn-agregar" onclick="guardarCP()">Guardar</button>
+        <button class="btn-salir" onclick="cerrarModal()">Cancelar</button>
+    `);
+}
+
+async function guardarCP() {
+    let desc = document.getElementById("nuevoCPDesc").value.trim();
+    if (desc === "") return;
+
+    let r = await apiInsertar("CP", { d_CP: desc });
+
+    cerrarModal();
+    if (!r.ok) mostrarAviso("Error", r.error);
+    abrirCodigoPostal();
+}
+
+function formEditarCP(index) {
+    let c = codigosPostales[index];
+
+    abrirModal("Editar codigo postal", `
+        <p><b>Clave:</b> ${esc(c.c_CP)}</p>
+        <input type="text" id="editCPDesc" value="${esc(c.d_CP)}">
+    `, `
+        <button class="btn-agregar" onclick="guardarEdicionCP(${index})">Guardar</button>
+        <button class="btn-salir" onclick="cerrarModal()">Cancelar</button>
+    `);
+}
+
+async function guardarEdicionCP(index) {
+    let desc = document.getElementById("editCPDesc").value.trim();
+    if (desc === "") return;
+
+    let r = await apiActualizar(
+        "CP",
+        { d_CP: desc },
+        { c_CP: codigosPostales[index].c_CP }
+    );
+
+    cerrarModal();
+    if (!r.ok) mostrarAviso("Error", r.error);
+    abrirCodigoPostal();
+}
+
+async function eliminarCP(index) {
+    let c = codigosPostales[index];
+
+    abrirModal("Confirmar", `
+        <p>Eliminar CP <b>"${esc(c.c_CP)}"</b>?</p>
+    `, `
+        <button class="btn-eliminar" onclick="confirmarEliminarCP(${index})">Eliminar</button>
+        <button class="btn-salir" onclick="cerrarModal()">Cancelar</button>
+    `);
+}
+
+async function confirmarEliminarCP(index) {
+    let c = codigosPostales[index];
+
+    let r = await apiEliminar("CP", { c_CP: c.c_CP });
+
+    cerrarModal();
+    if (!r.ok) mostrarAviso("Error", r.error);
+    abrirCodigoPostal();
+}
+
+
+/* =====================================================
+   ASENTAMIENTOS ADMIN
+===================================================== */
+
+async function abrirAsentamientoAdmin() {
+    asentamientos = await apiListar("asentamiento");
+    estados = await apiListar("estado");
+    municipios = await apiListar("municipio");
+    tiposAsentamiento = await apiListar("tipo_asentamiento");
+    zonas = await apiListar("zona");
+    codigosPostales = await apiListar("CP");
+
+    let html = `
+        <h2>Asentamientos</h2>
+
+        <label>Buscar por:</label>
+        <select id="campoBusquedaAdmin" class="buscador" onchange="buscarAsentamientoAdmin()">
+            <option value="c_CP">Codigo postal</option>
+            <option value="d_codigo">d_codigo</option>
+            <option value="id_asenta_cpcons">id_asenta</option>
+            <option value="d_asenta">Nombre del asentamiento</option>
+            <option value="c_estado">Estado</option>
+            <option value="c_municipio">Municipio</option>
+            <option value="c_tipo_asentamiento">Tipo de asentamiento</option>
+            <option value="c_zona">Zona</option>
+        </select>
+
+        <br>
+
+        <input class="buscador" id="buscarAsentamiento"
+               placeholder="Escribe el valor a buscar..."
+               onkeyup="buscarAsentamientoAdmin()">
+
+        <br>
+
+        <button class="btn-agregar" onclick="formAgregarAsentamiento()">+ Agregar asentamiento</button>
+
+        <div id="tablaAsentamientos">
+            ${generarTablaAsentamientos(asentamientos.slice(0, 300), true)}
+        </div>
+
+        <p><i>Mostrando primeros 300 registros. Usa el buscador para filtrar.</i></p>
+    `;
+
+    document.getElementById("contenidoAdmin").innerHTML = html;
+}
+
+function nombreEstado(c_estado) {
+    let e = estados.find(x => x.c_estado === c_estado);
+    return e ? e.nombre : c_estado;
+}
+
+function nombreMunicipio(c_estado, c_municipio) {
+    let m = municipios.find(x => x.c_estado === c_estado && x.c_municipio === c_municipio);
+    return m ? m.nombre : c_municipio;
+}
+
+function nombreTipo(c) {
+    let t = tiposAsentamiento.find(x => x.c_tipo_asentamiento === c);
+    return t ? t.d_tipo_asentamiento : c;
+}
+
+function nombreZona(c) {
+    let z = zonas.find(x => x.c_zona === c);
+    return z ? z.d_zona : c;
+}
+
+function generarTablaAsentamientos(datos, administrador) {
+    let html = `
+        <table>
+            <thead>
+                <tr>
+                    <th>d_codigo</th>
+                    <th>id_asenta</th>
+                    <th>Asentamiento</th>
+                    <th>Tipo</th>
+                    <th>Municipio</th>
+                    <th>Estado</th>
+                    <th>CP</th>
+                    <th>Zona</th>
+                    ${administrador ? "<th>Acciones</th>" : ""}
+                </tr>
+            </thead>
+            <tbody>
+    `;
+
+    datos.forEach((a, index) => {
+        html += `
+            <tr>
+                <td>${esc(a.d_codigo)}</td>
+                <td>${esc(a.id_asenta_cpcons)}</td>
+                <td>${esc(a.d_asenta)}</td>
+                <td>${esc(nombreTipo(a.c_tipo_asentamiento))}</td>
+                <td>${esc(nombreMunicipio(a.c_estado, a.c_municipio))}</td>
+                <td>${esc(nombreEstado(a.c_estado))}</td>
+                <td>${esc(a.c_CP)}</td>
+                <td>${esc(nombreZona(a.c_zona))}</td>
+        `;
+
+        if (administrador) {
+            html += `
+                <td>
+                    <button class="btn-editar" onclick="formEditarAsentamiento(${index})">Editar</button>
+                    <button class="btn-eliminar" onclick="eliminarAsentamiento(${index})">Eliminar</button>
+                </td>
+            `;
+        }
+
+        html += `</tr>`;
+    });
+
+    html += `</tbody></table>`;
+    return html;
+}
+
+function buscarAsentamientoAdmin() {
+    let texto = normalizar(document.getElementById("buscarAsentamiento").value);
+    let campo = document.getElementById("campoBusquedaAdmin").value;
+
+    if (texto === "") {
+        document.getElementById("tablaAsentamientos").innerHTML =
+            generarTablaAsentamientos(asentamientos.slice(0, 300), true);
+        return;
+    }
+
+    let valorBuscado = texto;
+
+    if (campo === "c_estado") {
+        let e = estados.find(x => normalizar(x.nombre) === texto || normalizar(x.c_estado) === texto);
+        valorBuscado = e ? normalizar(e.c_estado) : "__no_existe__";
+    }
+    else if (campo === "c_municipio") {
+        let m = municipios.find(x => normalizar(x.nombre) === texto || normalizar(x.c_municipio) === texto);
+        valorBuscado = m ? normalizar(m.c_municipio) : "__no_existe__";
+    }
+    else if (campo === "c_tipo_asentamiento") {
+        let t = tiposAsentamiento.find(x => normalizar(x.d_tipo_asentamiento) === texto || normalizar(x.c_tipo_asentamiento) === texto);
+        valorBuscado = t ? normalizar(t.c_tipo_asentamiento) : "__no_existe__";
+    }
+    else if (campo === "c_zona") {
+        let z = zonas.find(x => normalizar(x.d_zona) === texto || normalizar(x.c_zona) === texto);
+        valorBuscado = z ? normalizar(z.c_zona) : "__no_existe__";
+    }
+
+    let filtrados = asentamientos.filter(a => {
+        let valor = a[campo];
+        if (valor === null || valor === undefined) return false;
+        return normalizar(valor) === valorBuscado;
+    });
+
+    document.getElementById("tablaAsentamientos").innerHTML =
+        generarTablaAsentamientos(filtrados.slice(0, 300), true);
+}
+
+function opcionesTipos(sel) {
+    let html = `<option value="">-- Selecciona --</option>`;
+    tiposAsentamiento.forEach(t => {
+        let s = (t.c_tipo_asentamiento === sel) ? "selected" : "";
+        html += `<option value="${esc(t.c_tipo_asentamiento)}" ${s}>${esc(t.d_tipo_asentamiento)}</option>`;
+    });
+    return html;
+}
+
+function opcionesZonas(sel) {
+    let html = `<option value="">-- Selecciona --</option>`;
+    zonas.forEach(z => {
+        let s = (z.c_zona === sel) ? "selected" : "";
+        html += `<option value="${esc(z.c_zona)}" ${s}>${esc(z.d_zona)}</option>`;
+    });
+    return html;
+}
+
+function opcionesCPs(sel) {
+    let html = `<option value="">-- Selecciona --</option>`;
+    codigosPostales.forEach(c => {
+        let s = (c.c_CP === sel) ? "selected" : "";
+        html += `<option value="${esc(c.c_CP)}" ${s}>${esc(c.c_CP)} - ${esc(c.d_CP)}</option>`;
+    });
+    return html;
+}
+
+
+/* =====================================================
+   FORM AGREGAR ASENTAMIENTO (con autocompletado)
+===================================================== */
+
+function formAgregarAsentamiento() {
+    formAgregarAsentamientoConDatos({});
+}
+
+function formAgregarAsentamientoConDatos(datos) {
+
+    abrirModal("Agregar asentamiento", `
+        <input type="text" id="nuevoAsentDcodigo"
+               placeholder="d_codigo (5 digitos)"
+               value="${esc(datos.d_codigo || "")}">
+
+        <div class="autocomplete-wrap">
+            <input type="text" id="nuevoAsentEstadoInput"
+                   placeholder="Escribe el estado..."
+                   autocomplete="off">
+            <input type="hidden" id="nuevoAsentEstado">
+            <div class="autocomplete-lista" id="nuevoAsentEstadoLista" style="display:none;"></div>
+        </div>
+
+        <div class="autocomplete-wrap">
+            <input type="text" id="nuevoAsentMunicipioInput"
+                   placeholder="Escribe el municipio..."
+                   autocomplete="off">
+            <input type="hidden" id="nuevoAsentMunicipio">
+            <div class="autocomplete-lista" id="nuevoAsentMunicipioLista" style="display:none;"></div>
+        </div>
+
+        <div class="autocomplete-wrap">
+            <input type="text" id="nuevoAsentTipoInput"
+                   placeholder="Escribe el tipo de asentamiento..."
+                   autocomplete="off">
+            <input type="hidden" id="nuevoAsentTipo">
+            <div class="autocomplete-lista" id="nuevoAsentTipoLista" style="display:none;"></div>
+        </div>
+
+        <div class="autocomplete-wrap">
+            <input type="text" id="nuevoAsentZonaInput"
+                   placeholder="Escribe la zona..."
+                   autocomplete="off">
+            <input type="hidden" id="nuevoAsentZona">
+            <div class="autocomplete-lista" id="nuevoAsentZonaLista" style="display:none;"></div>
+        </div>
+
+        <div class="autocomplete-wrap">
+            <input type="text" id="nuevoAsentCPInput"
+                   placeholder="Escribe el codigo postal..."
+                   autocomplete="off">
+            <input type="hidden" id="nuevoAsentCP">
+            <div class="autocomplete-lista" id="nuevoAsentCPLista" style="display:none;"></div>
+        </div>
+
+        <input type="text" id="nuevoAsentNombre"
+               placeholder="Nombre del asentamiento"
+               value="${esc(datos.d_asenta || "")}">
+    `, `
+        <button class="btn-agregar" onclick="guardarAsentamiento()">Guardar</button>
+        <button class="btn-salir" onclick="cerrarModal()">Cancelar</button>
+    `);
+
+    // Precargar estado
+    if (datos.c_estado) {
+        let e = estados.find(x => x.c_estado === datos.c_estado);
+        if (e) {
+            document.getElementById("nuevoAsentEstadoInput").value = `${e.c_estado} - ${e.nombre}`;
+            document.getElementById("nuevoAsentEstado").value = e.c_estado;
+        }
+    }
+    // Precargar municipio
+    if (datos.c_municipio && datos.c_estado) {
+        let m = municipios.find(x =>
+            x.c_estado === datos.c_estado &&
+            x.c_municipio === datos.c_municipio
+        );
+        if (m) {
+            document.getElementById("nuevoAsentMunicipioInput").value = `${m.c_municipio} - ${m.nombre}`;
+            document.getElementById("nuevoAsentMunicipio").value = m.c_municipio;
+        }
+    }
+    // Precargar tipo
+    if (datos.c_tipo_asentamiento) {
+        let t = tiposAsentamiento.find(x => x.c_tipo_asentamiento === datos.c_tipo_asentamiento);
+        if (t) {
+            document.getElementById("nuevoAsentTipoInput").value = t.d_tipo_asentamiento;
+            document.getElementById("nuevoAsentTipo").value = t.c_tipo_asentamiento;
+        }
+    }
+    // Precargar zona
+    if (datos.c_zona) {
+        let z = zonas.find(x => x.c_zona === datos.c_zona);
+        if (z) {
+            document.getElementById("nuevoAsentZonaInput").value = z.d_zona;
+            document.getElementById("nuevoAsentZona").value = z.c_zona;
+        }
+    }
+    // Precargar CP
+    if (datos.c_CP) {
+        let c = codigosPostales.find(x => x.c_CP === datos.c_CP);
+        if (c) {
+            document.getElementById("nuevoAsentCPInput").value = `${c.c_CP} - ${c.d_CP}`;
+            document.getElementById("nuevoAsentCP").value = c.c_CP;
+        }
+    }
+
+    // Autocomplete ESTADO
+    inicializarAutocomplete({
+        idInput: "nuevoAsentEstadoInput",
+        idLista: "nuevoAsentEstadoLista",
+        idHidden: "nuevoAsentEstado",
+        obtenerDatos: () => estados,
+        campoId: "c_estado",
+        formatearTexto: (e) => `${e.c_estado} - ${e.nombre}`,
+        alSeleccionar: () => {
+            document.getElementById("nuevoAsentMunicipioInput").value = "";
+            document.getElementById("nuevoAsentMunicipio").value = "";
+        },
+        alCrearNuevo: null
+    });
+
+    // Autocomplete MUNICIPIO
+    inicializarAutocomplete({
+        idInput: "nuevoAsentMunicipioInput",
+        idLista: "nuevoAsentMunicipioLista",
+        idHidden: "nuevoAsentMunicipio",
+        obtenerDatos: () => {
+            let c_estado = document.getElementById("nuevoAsentEstado").value;
+            if (c_estado === "") return [];
+            return municipios.filter(m => m.c_estado === c_estado);
+        },
+        campoId: "c_municipio",
+        formatearTexto: (m) => `${m.c_municipio} - ${m.nombre}`,
+        alSeleccionar: null,
+        alCrearNuevo: function (nombre) {
+            crearRegistroDesdeAsentamiento("municipio", nombre);
+        }
+    });
+
+    // Autocomplete TIPO
+    inicializarAutocomplete({
+        idInput: "nuevoAsentTipoInput",
+        idLista: "nuevoAsentTipoLista",
+        idHidden: "nuevoAsentTipo",
+        obtenerDatos: () => tiposAsentamiento,
+        campoId: "c_tipo_asentamiento",
+        formatearTexto: (t) => t.d_tipo_asentamiento,
+        alSeleccionar: null,
+        alCrearNuevo: function (nombre) {
+            crearRegistroDesdeAsentamiento("tipo_asentamiento", nombre);
+        }
+    });
+
+    // Autocomplete ZONA
+    inicializarAutocomplete({
+        idInput: "nuevoAsentZonaInput",
+        idLista: "nuevoAsentZonaLista",
+        idHidden: "nuevoAsentZona",
+        obtenerDatos: () => zonas,
+        campoId: "c_zona",
+        formatearTexto: (z) => z.d_zona,
+        alSeleccionar: null,
+        alCrearNuevo: function (nombre) {
+            crearRegistroDesdeAsentamiento("zona", nombre);
+        }
+    });
+
+    // Autocomplete CP
+    inicializarAutocomplete({
+        idInput: "nuevoAsentCPInput",
+        idLista: "nuevoAsentCPLista",
+        idHidden: "nuevoAsentCP",
+        obtenerDatos: () => codigosPostales,
+        campoId: "c_CP",
+        formatearTexto: (c) => `${c.c_CP} - ${c.d_CP}`,
+        alSeleccionar: null,
+        alCrearNuevo: function (nombre) {
+            crearRegistroDesdeAsentamiento("CP", nombre);
+        }
+    });
+}
+
+function capturarEstadoFormAsentamiento() {
+    return {
+        d_codigo:            document.getElementById("nuevoAsentDcodigo").value,
+        c_estado:            document.getElementById("nuevoAsentEstado").value,
+        c_municipio:         document.getElementById("nuevoAsentMunicipio").value,
+        c_tipo_asentamiento: document.getElementById("nuevoAsentTipo").value,
+        c_zona:              document.getElementById("nuevoAsentZona").value,
+        c_CP:                document.getElementById("nuevoAsentCP").value,
+        d_asenta:            document.getElementById("nuevoAsentNombre").value
+    };
+}
+
+function crearRegistroDesdeAsentamiento(tipo, nombre) {
+
+    window.tempAsent = capturarEstadoFormAsentamiento();
+
+    let mensajeTabla = "";
+    if (tipo === "municipio") mensajeTabla = "municipio";
+    else if (tipo === "tipo_asentamiento") mensajeTabla = "tipo de asentamiento";
+    else if (tipo === "zona") mensajeTabla = "zona";
+    else if (tipo === "CP") mensajeTabla = "codigo postal";
+
+    if (tipo === "municipio" && window.tempAsent.c_estado === "") {
+        mostrarAviso("Aviso", "Primero selecciona el estado");
+        return;
+    }
+
+    abrirModal("Confirmar", `
+        <p>Crear el <b>${esc(mensajeTabla)}</b> <b>"${esc(nombre)}"</b>?</p>
+    `, `
+        <button class="btn-agregar" onclick='confirmarCrearDesdeAsentamiento(${JSON.stringify(tipo)}, ${JSON.stringify(nombre)})'>Aceptar</button>
+        <button class="btn-salir" onclick="cancelarCrearDesdeAsentamiento()">Cancelar</button>
+    `);
+}
+
+function cancelarCrearDesdeAsentamiento() {
+    let t = window.tempAsent || {};
+    formAgregarAsentamientoConDatos(t);
+}
+
+async function confirmarCrearDesdeAsentamiento(tipo, nombre) {
+
+    let t = window.tempAsent || {};
+
+    let campos = {};
+
+    if (tipo === "municipio") {
+        campos.c_estado = t.c_estado;
+        campos.nombre   = nombre;
+    }
+    else if (tipo === "tipo_asentamiento") {
+        campos.d_tipo_asentamiento = nombre;
+    }
+    else if (tipo === "zona") {
+        campos.d_zona = nombre;
+    }
+    else if (tipo === "CP") {
+        campos.d_CP = nombre;
+    }
+
+    let r = await apiInsertar(tipo, campos);
+
+    if (!r.ok) {
+        mostrarAviso("Error", r.error);
+        return;
+    }
+
+    if (tipo === "municipio") {
+        municipios = await apiListar("municipio");
+        let creado = municipios
+            .filter(m => m.c_estado === t.c_estado && m.nombre === nombre)
+            .pop();
+        if (creado) t.c_municipio = creado.c_municipio;
+    }
+    else if (tipo === "tipo_asentamiento") {
+        tiposAsentamiento = await apiListar("tipo_asentamiento");
+        let creado = tiposAsentamiento
+            .filter(x => x.d_tipo_asentamiento === nombre)
+            .pop();
+        if (creado) t.c_tipo_asentamiento = creado.c_tipo_asentamiento;
+    }
+    else if (tipo === "zona") {
+        zonas = await apiListar("zona");
+        let creado = zonas.filter(x => x.d_zona === nombre).pop();
+        if (creado) t.c_zona = creado.c_zona;
+    }
+    else if (tipo === "CP") {
+        codigosPostales = await apiListar("CP");
+        let creado = codigosPostales.filter(x => x.d_CP === nombre).pop();
+        if (creado) t.c_CP = creado.c_CP;
+    }
+
+    formAgregarAsentamientoConDatos(t);
+}
+
+async function guardarAsentamiento() {
+    let d_codigo = document.getElementById("nuevoAsentDcodigo").value.trim();
+    let c_estado = document.getElementById("nuevoAsentEstado").value;
+    let c_muni   = document.getElementById("nuevoAsentMunicipio").value;
+    let c_tipo   = document.getElementById("nuevoAsentTipo").value;
+    let c_zona   = document.getElementById("nuevoAsentZona").value;
+    let c_cp     = document.getElementById("nuevoAsentCP").value;
+    let d_asenta = document.getElementById("nuevoAsentNombre").value.trim();
+
+    if (d_codigo === "" || c_estado === "" || c_muni === "" ||
+        c_tipo === "" || c_zona === "" || c_cp === "" || d_asenta === "") {
+        mostrarAviso("Aviso", "Todos los campos son obligatorios");
+        return;
+    }
+
+    let r = await apiInsertar("asentamiento", {
+        d_codigo:            d_codigo,
+        c_estado:            c_estado,
+        c_municipio:         c_muni,
+        c_tipo_asentamiento: c_tipo,
+        c_zona:              c_zona,
+        c_CP:                c_cp,
+        d_asenta:            d_asenta
+    });
+
+    cerrarModal();
+    if (!r.ok) mostrarAviso("Error", r.error);
+    abrirAsentamientoAdmin();
+}
+
+
+/* =====================================================
+   EDITAR / ELIMINAR ASENTAMIENTO
+===================================================== */
+
+function formEditarAsentamiento(index) {
+    let a = asentamientos[index];
+
+    abrirModal("Editar asentamiento", `
+        <p><b>d_codigo:</b> ${esc(a.d_codigo)}</p>
+        <p><b>id_asenta:</b> ${esc(a.id_asenta_cpcons)}</p>
+        <p><b>Estado:</b> ${esc(a.c_estado)}</p>
+        <p><b>Municipio:</b> ${esc(a.c_municipio)}</p>
+        <select id="editAsentTipo">${opcionesTipos(a.c_tipo_asentamiento)}</select>
+        <select id="editAsentZona">${opcionesZonas(a.c_zona)}</select>
+        <select id="editAsentCP">${opcionesCPs(a.c_CP)}</select>
+        <input type="text" id="editAsentNombre" value="${esc(a.d_asenta)}">
+    `, `
+        <button class="btn-agregar" onclick="guardarEdicionAsentamiento(${index})">Guardar</button>
+        <button class="btn-salir" onclick="cerrarModal()">Cancelar</button>
+    `);
+}
+
+async function guardarEdicionAsentamiento(index) {
+    let a = asentamientos[index];
+    let c_tipo = document.getElementById("editAsentTipo").value;
+    let c_zona = document.getElementById("editAsentZona").value;
+    let c_cp = document.getElementById("editAsentCP").value;
+    let d_asenta = document.getElementById("editAsentNombre").value.trim();
+
+    let r = await apiActualizar(
+        "asentamiento",
+        {
+            c_tipo_asentamiento: c_tipo,
+            c_zona: c_zona,
+            c_CP: c_cp,
+            d_asenta: d_asenta
+        },
+        {
+            d_codigo: a.d_codigo,
+            c_estado: a.c_estado,
+            c_municipio: a.c_municipio,
+            id_asenta_cpcons: a.id_asenta_cpcons
+        }
+    );
+
+    cerrarModal();
+    if (!r.ok) mostrarAviso("Error", r.error);
+    abrirAsentamientoAdmin();
+}
+
+async function eliminarAsentamiento(index) {
+    let a = asentamientos[index];
+
+    abrirModal("Confirmar", `
+        <p>Eliminar asentamiento <b>"${esc(a.d_asenta)}"</b>?</p>
+    `, `
+        <button class="btn-eliminar" onclick="confirmarEliminarAsentamiento(${index})">Eliminar</button>
+        <button class="btn-salir" onclick="cerrarModal()">Cancelar</button>
+    `);
+}
+
+async function confirmarEliminarAsentamiento(index) {
+    let a = asentamientos[index];
+
+    let r = await apiEliminar("asentamiento", {
+        d_codigo: a.d_codigo,
+        c_estado: a.c_estado,
+        c_municipio: a.c_municipio,
+        id_asenta_cpcons: a.id_asenta_cpcons
+    });
+
+    cerrarModal();
+    if (!r.ok) mostrarAviso("Error", r.error);
+    abrirAsentamientoAdmin();
+}
+
+
+/* =====================================================
+   ASENTAMIENTOS CONTRIBUYENTE
+===================================================== */
+
+async function abrirAsentamientoContribuyente() {
+    asentamientos = await apiListar("asentamiento");
+    estados = await apiListar("estado");
+    municipios = await apiListar("municipio");
+    tiposAsentamiento = await apiListar("tipo_asentamiento");
+    zonas = await apiListar("zona");
+
+    let html = `
+        <h2>Consulta de asentamientos</h2>
+        <p>El contribuyente solamente puede consultar informacion.</p>
+
+        <label>Buscar por:</label>
+        <select id="campoBusquedaContribuyente" class="buscador">
+            <option value="c_CP">Codigo postal</option>
+            <option value="d_codigo">d_codigo</option>
+            <option value="id_asenta_cpcons">id_asenta</option>
+            <option value="d_asenta">Nombre del asentamiento</option>
+            <option value="c_estado">Estado</option>
+            <option value="c_municipio">Municipio</option>
+            <option value="c_tipo_asentamiento">Tipo de asentamiento</option>
+            <option value="c_zona">Zona</option>
+        </select>
+
+        <br>
+
+        <input class="buscador" id="buscarContribuyente"
+               placeholder="Escribe el valor a buscar..."
+               onkeyup="buscarAsentamientoContribuyente()">
+
+        <div id="tablaContribuyente">
+            ${generarTablaAsentamientos(asentamientos.slice(0, 200), false)}
+        </div>
+        <p><i>Mostrando primeros 200 registros. Usa el buscador para filtrar.</i></p>
+    `;
+
+    document.getElementById("contenidoContribuyente").innerHTML = html;
+}
+
+function buscarAsentamientoContribuyente() {
+    let texto = normalizar(document.getElementById("buscarContribuyente").value);
+    let campo = document.getElementById("campoBusquedaContribuyente").value;
+
+    if (texto === "") {
+        document.getElementById("tablaContribuyente").innerHTML =
+            generarTablaAsentamientos(asentamientos.slice(0, 200), false);
+        return;
+    }
+
+    let valorBuscado = texto;
+
+    if (campo === "c_estado") {
+        let e = estados.find(x => normalizar(x.nombre) === texto || normalizar(x.c_estado) === texto);
+        valorBuscado = e ? normalizar(e.c_estado) : "__no_existe__";
+    }
+    else if (campo === "c_municipio") {
+        let m = municipios.find(x => normalizar(x.nombre) === texto || normalizar(x.c_municipio) === texto);
+        valorBuscado = m ? normalizar(m.c_municipio) : "__no_existe__";
+    }
+    else if (campo === "c_tipo_asentamiento") {
+        let t = tiposAsentamiento.find(x => normalizar(x.d_tipo_asentamiento) === texto || normalizar(x.c_tipo_asentamiento) === texto);
+        valorBuscado = t ? normalizar(t.c_tipo_asentamiento) : "__no_existe__";
+    }
+    else if (campo === "c_zona") {
+        let z = zonas.find(x => normalizar(x.d_zona) === texto || normalizar(x.c_zona) === texto);
+        valorBuscado = z ? normalizar(z.c_zona) : "__no_existe__";
+    }
+
+    let filtrados = asentamientos.filter(a => {
+        let valor = a[campo];
+        if (valor === null || valor === undefined) return false;
+        return normalizar(valor) === valorBuscado;
+    });
+
+    document.getElementById("tablaContribuyente").innerHTML =
+        generarTablaAsentamientos(filtrados.slice(0, 200), false);
+}
+
+
+/* =====================================================
+   AUDITORIAS
+===================================================== */
+
+async function abrirAuditorias() {
+    let html = `
+        <h2>Auditorias</h2>
+        <p>Historial de cambios registrados en la base de datos.</p>
+        <p><i>Mostrando los ultimos 500 movimientos.</i></p>
+
+        <label>Filtrar por accion:</label>
+        <select id="filtroAccionAuditoria" class="buscador" onchange="aplicarFiltroAuditorias()">
+            <option value="">Todas</option>
+            <option value="INSERT">INSERT (agregar)</option>
+            <option value="UPDATE">UPDATE (actualizar)</option>
+            <option value="DELETE">DELETE (eliminar)</option>
+        </select>
+
+        <div id="tablaAuditorias">Cargando...</div>
+    `;
+
+    document.getElementById("contenidoAdmin").innerHTML = html;
+
+    const r = await fetch("api.php?accion=listar_auditorias");
+    const j = await r.json();
+
+    if (!j.ok) {
+        document.getElementById("tablaAuditorias").innerHTML =
+            `<p class="mensaje">Error al cargar auditorias.</p>`;
+        return;
+    }
+
+    window.auditoriasCache = j.datos;
+    renderAuditorias();
+}
+
+function aplicarFiltroAuditorias() {
+    renderAuditorias();
+}
+
+function renderAuditorias() {
+    let accion = document.getElementById("filtroAccionAuditoria").value;
+    let datos = window.auditoriasCache || [];
+
+    if (accion !== "") {
+        datos = datos.filter(a => a.accion === accion);
+    }
+
+    if (datos.length === 0) {
+        document.getElementById("tablaAuditorias").innerHTML = `<p>No hay movimientos con ese filtro.</p>`;
+        return;
+    }
+
+    let tabla = `
+        <table>
+            <thead>
+                <tr>
+                    <th>Fecha</th>
+                    <th>Tabla</th>
+                    <th>Accion</th>
+                    <th>Dato</th>
+                    <th>Usuario</th>
+                </tr>
+            </thead>
+            <tbody>
+    `;
+
+    datos.forEach(a => {
+        tabla += `
+            <tr>
+                <td>${esc(a.fecha)}</td>
+                <td>${esc(a.tabla)}</td>
+                <td>${esc(a.accion)}</td>
+                <td style="text-align:left; font-size:12px;">${esc(a.detalle)}</td>
+                <td>${esc(a.usuario)}</td>
+            </tr>
+        `;
+    });
+
+    tabla += `</tbody></table>`;
+
+    document.getElementById("tablaAuditorias").innerHTML = tabla;
+}
+
+</script>
+
+</body>
+</html>
